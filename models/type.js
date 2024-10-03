@@ -7,7 +7,7 @@ const typeSchema = new Schema({
         required: true,
         unique: true
     },
-    type: {
+    typeName: {
         type: String,
         required: true 
     },

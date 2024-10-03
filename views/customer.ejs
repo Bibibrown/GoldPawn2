@@ -1,33 +1,164 @@
+<!DOCTYPE html>
+<html lang="th">
 
-// ตรวจสอบข้อมูลก่อนส่ง
-if (!validateCustomerData(updatedCustomerData)) return;
-
-// ส่งข้อมูลที่แก้ไขไปยังเซิร์ฟเวอร์
-fetch(`/customer/${encodeURIComponent(updatedCustomerData.customerId)}`, {
-    method: 'PUT',
-    headers: {
-        'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(updatedCustomerData)
-})
-    .then(response => {
-        if (!response.ok) {
-            return response.json().then(data => { throw new Error(data.message || 'เกิดข้อผิดพลาดในการแก้ไขข้อมูลลูกค้า'); });
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ข้อมูลลูกค้า</title>
+    <link rel='stylesheet' href="/bootstrap/css/bootstrap.min.css" />
+    <script src="/bootstrap/js/bootstrap.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@200;300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            font-family: "Mitr", sans-serif;
+            font-weight: 400;
+            font-style: normal;
         }
-        return response.json();
-    })
-    .then(data => {
-        alert('แก้ไขข้อมูลลูกค้าเรียบร้อย');
-        setFormReadonly(true);  // ล็อกฟอร์มอีกครั้งหลังจากแก้ไข
-        document.getElementById('editButton').style.display = 'inline-block'; // แสดงปุ่มแก้ไข
-        document.getElementById('confirmButton').style.display = 'none'; // ซ่อนปุ่มยืนยัน
-        document.getElementById('addGoldButton').style.display = 'inline-block'; // แสดงปุ่มเพิ่มข้อมูลจำนำทอง
-    })
-    .catch(err => {
-        alert(err.message);
-    });
-});
-</script>
+
+        .container {
+            width: 50%;
+        }
+    </style>
+</head>
+
+<body>
+    <%- include('./partials/nav.ejs') %>
+
+        <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+            <ol class="breadcrumb m-3">
+                <li class="breadcrumb-item"><a href="/">หน้าหลัก</a></li>
+                <li class="breadcrumb-item active" aria-current="page">ข้อมูลลูกค้า</li>
+            </ol>
+        </nav>
+
+        <div class="container mt-4">
+            <h2>ข้อมูลลูกค้า</h2>
+            <form id="customerForm" class="mt-4">
+                <div class="row mb-3">
+                    <label for="customerId" class="col-sm-2 col-form-label">ID ลูกค้า</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="customerId" value="<%= customer.customerId || '' %>"
+                            readonly>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <label for="customerFName" class="col-sm-2 col-form-label">ชื่อ</label>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control" id="customerFName"
+                            value="<%= customer.customerFName || '' %>" readonly>
+                    </div>
+                    <label for="customerLName" class="col-sm-2 col-form-label">นามสกุล</label>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control" id="customerLName"
+                            value="<%= customer.customerLName || '' %>" readonly>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <label for="customerAddress" class="col-sm-2 col-form-label">ที่อยู่</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="customerAddress"
+                            value="<%= customer.customerAddress || '' %>" readonly>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <label for="customerPhone" class="col-sm-2 col-form-label">เบอร์โทร</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" id="customerPhone"
+                            value="<%= customer.customerPhone || '' %>" readonly>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-center mt-5">
+                    <button type="button" class="btn btn-secondary me-2" id="editButton">แก้ไขข้อมูลลูกค้า</button>
+                    <button type="button" class="btn btn-success me-2" id="confirmButton"
+                        style="display:none;">ยืนยันแก้ไขข้อมูล</button>
+                    <button type="button" class="btn btn-primary" id="addGoldButton">เพิ่มข้อมูลจำนำทอง</button>
+                </div>
+            </form>
+        </div>
+
+        <footer class="mt-5"></footer>
+
+        <script>
+            // ตั้งค่าให้ฟิลด์ต่าง ๆ เป็น readonly เมื่อโหลดข้อมูล
+            function setFormReadonly(isReadonly) {
+                document.getElementById('customerFName').readOnly = isReadonly;
+                document.getElementById('customerLName').readOnly = isReadonly;
+                document.getElementById('customerAddress').readOnly = isReadonly;
+                document.getElementById('customerPhone').readOnly = isReadonly;
+            }
+
+            // ปลดล็อกฟอร์มเมื่อกดปุ่ม "แก้ไขข้อมูลลูกค้า"
+            document.getElementById('editButton').addEventListener('click', function () {
+                setFormReadonly(false);
+                document.getElementById('editButton').style.display = 'none'; // ซ่อนปุ่มแก้ไข
+                document.getElementById('confirmButton').style.display = 'inline-block'; // แสดงปุ่มยืนยัน
+                document.getElementById('addGoldButton').style.display = 'none'; // ซ่อนปุ่มเพิ่มข้อมูลจำนำทอง
+                document.getElementById('customerFName').focus();
+            });
+
+            // ตรวจสอบความถูกต้องของข้อมูลลูกค้าก่อนส่งไปอัปเดต
+            function validateCustomerData(data) {
+                const phonePattern = /^\d{10}$/;
+                if (!phonePattern.test(data.customerPhone)) {
+                    alert('เบอร์โทรต้องเป็นตัวเลข 10 หลัก');
+                    return false;
+                }
+                return true;
+            }
+
+            // ตรวจสอบและส่งข้อมูลที่แก้ไข
+            document.getElementById('confirmButton').addEventListener('click', function () {
+                const updatedCustomerData = {
+                    customerId: document.getElementById('customerId').value,
+                    customerFName: document.getElementById('customerFName').value,
+                    customerLName: document.getElementById('customerLName').value,
+                    customerAddress: document.getElementById('customerAddress').value,
+                    customerPhone: document.getElementById('customerPhone').value
+                };
+
+                // ตรวจสอบข้อมูลก่อนส่ง
+                if (!validateCustomerData(updatedCustomerData)) return;
+
+                // ส่งข้อมูลที่แก้ไขไปยังเซิร์ฟเวอร์
+                fetch(`/customer/${encodeURIComponent(updatedCustomerData.customerId)}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(updatedCustomerData)
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            return response.json().then(data => { throw new Error(data.message || 'เกิดข้อผิดพลาดในการแก้ไขข้อมูลลูกค้า'); });
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        alert('แก้ไขข้อมูลลูกค้าเรียบร้อย');
+                        setFormReadonly(true);  // ล็อกฟอร์มอีกครั้งหลังจากแก้ไข
+                        document.getElementById('editButton').style.display = 'inline-block'; // แสดงปุ่มแก้ไข
+                        document.getElementById('confirmButton').style.display = 'none'; // ซ่อนปุ่มยืนยัน
+                        document.getElementById('addGoldButton').style.display = 'inline-block'; // แสดงปุ่มเพิ่มข้อมูลจำนำทอง
+                    })
+                    .catch(err => {
+                        alert(err.message);
+                    });
+            });
+
+            // ปุ่มเพิ่มข้อมูลจำนำทอง
+            document.getElementById('addGoldButton').addEventListener('click', function () {
+                const customerId = document.getElementById('customerId').value;
+                if (!customerId) {
+                    alert('กรุณาค้นหาหรือลงทะเบียนข้อมูลลูกค้าก่อน');
+                    return;
+                }
+                // เปลี่ยนเส้นทางไปยังเส้นทางเซิร์ฟเวอร์ที่เรนเดอร์ addpawn.ejs พร้อมส่ง customerId ผ่านพารามิเตอร์
+                window.location.href = `/pawn/addpawn/${encodeURIComponent(customerId)}`;
+            });
+        </script>
 </body>
 
 </html>
