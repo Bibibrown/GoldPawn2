@@ -25,8 +25,8 @@ const customerSchema = new Schema({
         required: true
     },
     pawnId: {
-        type: [String], // ฟิลด์ pid เป็น array ของ String
-        required: false // สามารถกำหนดให้เป็น optional หรือ required ได้
+        type: [String], 
+        required: false 
     }
 });
 

@@ -7,10 +7,6 @@ const paymentSchema = new Schema({
         required: true,
         unique: true
     },
-    goldId: {
-        type: [String], // ฟิลด์ pid เป็น array ของ String
-        required: false // สามารถกำหนดให้เป็น optional หรือ required ได้
-    },
     paymentDate: {
         type: Date,
         default: Date.now // วันที่จ่ายจะเป็นวันที่ปัจจุบัน
@@ -21,7 +17,6 @@ const paymentSchema = new Schema({
     },
     endDate: {
         type: Date,
-        
     },
     nextDueDate: {
         type: Date,

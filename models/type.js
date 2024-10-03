@@ -12,8 +12,8 @@ const typeSchema = new Schema({
         required: true 
     },
     goldId: {
-        type: [String], // ฟิลด์ pid เป็น array ของ String
-        required: false // สามารถกำหนดให้เป็น optional หรือ required ได้
+        type: [String], 
+        required: false 
     }
 },{ timestamps: true } );
 
