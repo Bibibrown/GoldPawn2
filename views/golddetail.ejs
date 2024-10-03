@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ประวัติทองที่จำนำ</title>
+    <link rel='stylesheet' href="/bootstrap/css/bootstrap.min.css" />
+    <script src="/bootstrap/js/bootstrap.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *{
+            font-family: "Mitr", sans-serif;
+            font-weight: 400;
+            font-style: normal;
+        }
+    </style>
+</head>
+<body>
+    <%- include('./partials/nav.ejs') %>
+
+    <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+        <ol class="breadcrumb m-3">
+            <li class="breadcrumb-item"><a href="/">หน้าหลัก</a></li>
+            <li class="breadcrumb-item"><a href="/customer/<%= customerId %>">ข้อมูลลูกค้า</a></li>
+            <li class="breadcrumb-item"><a href="/pawn/addpawn/<%= customerId %>">ข้อมูลจำนำทอง</a></li>
+            <li class="breadcrumb-item active" aria-current="page">ประวัติการชำระของทอง ID: <%= goldId %></li>
+        </ol>
+    </nav>
+
+    <div class="container mt-4">
+        <h2>ประวัติการชำระของทอง ID: <%= goldId %></h2>
+
+        <!-- Table for Payment History -->
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>วันที่ชำระ</th>
+                    <th>วันที่เริ่มต้น</th>
+                    <!-- <th>วันที่สิ้นสุด</th> -->
+                    <th>กำหนดชำระครั้งถัดไป</th>
+                    <th>เงินต้น</th>
+                    <th>จำนวนเงิน (บาท)</th>
+                    <th>ประเภทการชำระ</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Dynamic data goes here -->
+                <% if (paymentHistory.length === 0) { %>
+                    <tr>
+                        <td colspan="6" class="text-center">ไม่มีประวัติการชำระเงิน</td>
+                    </tr>
+                <% } else { %>
+                    <!-- Dynamic data goes here -->
+                    <% paymentHistory.forEach(history => { %>
+                        <tr>
+                            <td><%= history.paymentDate.toLocaleDateString('th-TH') %></td>
+                            <td><%= history.startDate.toLocaleDateString('th-TH') %></td>
+                            <!-- <td><%= history.endDate.toLocaleDateString('th-TH') %></td> -->
+                            <td><%= history.nextDueDate.toLocaleDateString('th-TH') %></td>
+                            <td><%= principal %></td>
+                            <td><%= history.amount.toLocaleString('th-TH') %></td>
+                            <td><%= history.statusPawn.toLocaleString('th-TH') %></td>
+                        </tr>
+                    <% }); %>
+                <% } %>
+            </tbody>
+        </table>
+
+        <!-- Action Buttons -->
+        <div class="d-flex justify-content-end">
+            <button class="btn btn-secondary me-2" data-bs-toggle="modal" data-bs-target="#extendPaymentModal" 
+                    data-payment-id="<%= goldId %>"> <!-- แทนที่ YOUR_PAYMENT_ID ด้วย ID ของการชำระเงิน -->
+                ต่อดอก
+            </button>
+            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#redeemModal">ไถ่คืน</button>
+        </div>
+        <!-- <div class="d-flex justify-content-end">
+            <button class="btn btn-secondary me-2" data-bs-toggle="modal" data-bs-target="#extendPaymentModal">ต่อดอก</button>
+            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#redeemModal">ไถ่คืน</button>
+        </div> -->
+    </div>
+
+    <!-- Modal for "ต่อดอก" -->
+    <div class="modal fade" id="extendPaymentModal" tabindex="-1" aria-labelledby="extendPaymentModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="extendPaymentModalLabel">ต่อดอก</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="extendPaymentForm">
+                        <div class="mb-3 row">
+                            <label for="startDate" class="col-sm-4 col-form-label">วันที่เริ่มต้น</label>
+                            <div class="col-sm-8">
+                                <input type="date" class="form-control" id="startDate" placeholder="วันที่เริ่มต้น" readonly>
+                            </div>
+                        </div>
+                        <div class="mb-3 row">
+                            <label for="endDate" class="col-sm-4 col-form-label">วันที่สิ้นสุด</label>
+                            <div class="col-sm-8">
+                                <input type="date" class="form-control" id="endDate" placeholder="วันที่สิ้นสุด" readonly>
+                            </div>
+                        </div>
+                        <div class="mb-3 row">
+                            <label for="nextDueDate" class="col-sm-4 col-form-label">กำหนดครั้งถัดไป</label>
+                            <div class="col-sm-8">
+                                <input type="date" class="form-control" id="nextDueDate" placeholder="กำหนดครั้งถัดไป" readonly>
+                            </div>
+                        </div>
+                        <div class="mb-3 row">
+                            <label for="amount" class="col-sm-4 col-form-label">เงินที่ชำระ (บาท)</label>
+                            <div class="col-sm-8">
+                                <input type="number" class="form-control" id="amount" placeholder="จำนวนเงิน" readonly>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <!-- <button type="button" class="btn btn-success" id="confirmExtend">ยืนยัน</button> -->
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success" id="confirmExtend">ยืนยัน</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for "ไถ่คืน" -->
+    <div class="modal fade" id="redeemModal" tabindex="-1" aria-labelledby="redeemModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="redeemModalLabel">ไถ่คืน</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="redeemForm">
+                        <div class="mb-3 row">
+                            <label for="redeemStartDate" class="col-sm-4 col-form-label">วันที่เริ่มต้น</label>
+                            <div class="col-sm-8">
+                                <input type="date" class="form-control" id="redeemStartDate" placeholder="วันที่เริ่มต้น">
+                            </div>
+                        </div>
+                        <div class="mb-3 row">
+                            <label for="redeemEndDate" class="col-sm-4 col-form-label">วันที่สิ้นสุด</label>
+                            <div class="col-sm-8">
+                                <input type="date" class="form-control" id="redeemEndDate" placeholder="วันที่สิ้นสุด">
+                            </div>
+                        </div>
+                        <div class="mb-3 row">
+                            <label for="initialAmount" class="col-sm-4 col-form-label">เงินต้น (บาท)</label>
+                            <div class="col-sm-8">
+                                <input type="number" class="form-control" id="initialAmount" placeholder="จำนวนเงินต้น" oninput="calculateTotal()">
+                            </div>
+                        </div>
+                        <div class="mb-3 row">
+                            <label for="interestAmount" class="col-sm-4 col-form-label">เงินดอก (บาท)</label>
+                            <div class="col-sm-8">
+                                <input type="number" class="form-control" id="interestAmount" placeholder="จำนวนเงินดอก" oninput="calculateTotal()">
+                            </div>
+                        </div>
+                        <div class="mb-3 row">
+                            <label for="totalAmount" class="col-sm-4 col-form-label">เงินสุทธิ (บาท)</label>
+                            <div class="col-sm-8">
+                                <input type="number" class="form-control" id="totalAmount" placeholder="จำนวนเงินสุทธิ" readonly>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">ยืนยัน</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="mt-5"></footer>
+
+    <script>
+        // Function to calculate the net amount (เงินสุทธิ)
+        function calculateTotal() {
+            const principal = parseFloat(document.getElementById('initialAmount').value) || 0;
+            const interest = parseFloat(document.getElementById('interestAmount').value) || 0;
+            const total = principal + interest;
+            document.getElementById('totalAmount').value = total.toFixed(2); // Update total amount in the form
+        }
+
+        // Clear form data when modal is closed
+        document.getElementById('redeemModal').addEventListener('hidden.bs.modal', function () {
+            document.getElementById('redeemForm').reset(); // Clear all inputs in the redeem form
+        });
+                
+        // ฟังก์ชันสำหรับดึงข้อมูลการชำระเงิน
+        const fetchPaymentDetails = async (goldId) => { // เปลี่ยน parameter เป็น goldId
+            try {
+                const response = await fetch(`/payment/gold/${encodeURIComponent(goldId)}`); // ใช้ goldId
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Error fetching payment details:', errorText);
+                    throw new Error('ไม่สามารถดึงข้อมูลการชำระเงินได้');
+                }
+                const payment = await response.json();
+                return payment;
+            } catch (error) {
+                console.error('Error fetching payment details:', error);
+                alert('เกิดข้อผิดพลาดในการดึงข้อมูล');
+                return null;
+            }
+        };
+
+        // ฟังก์ชันสำหรับยืนยันการต่อดอก
+        const confirmExtendPayment = async (goldId) => { // เปลี่ยน parameter เป็น goldId
+            try {
+                const response = await fetch(`/payment/extend-payment/${encodeURIComponent(goldId)}`, { // ใช้ goldId
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ /* ข้อมูลที่ต้องการส่ง หากมี */ })
+                });
+
+                if (!response.ok) {
+                    const errorText = await response.text(); // รับผลลัพธ์เป็นข้อความเพื่อตรวจสอบ
+                    console.error('Error confirming extend:', errorText);
+                    throw new Error('ไม่สามารถต่อดอกได้');
+                }
+
+                const result = await response.json();
+                console.log('Extend payment successful:', result);
+                // อาจจะปิดโมดัลหลังจากทำการต่อดอกสำเร็จ
+                $('#extendPaymentModal').modal('hide'); // ตัวอย่างการปิดโมดัล
+            } catch (error) {
+                console.error('Error confirming extend:', error);
+                alert('เกิดข้อผิดพลาดในการต่อดอก');
+            }
+        };
+
+        // ดักฟังเหตุการณ์เมื่อโมดัล "ต่อดอก" เปิด
+        document.getElementById('extendPaymentModal').addEventListener('show.bs.modal', async function(event) {
+            const button = event.relatedTarget; // รับปุ่มที่กด
+            const goldId = button.getAttribute('data-payment-id'); // ดึง goldId
+
+            // ดึงข้อมูลการชำระเงิน
+            const payment = await fetchPaymentDetails(goldId); // ใช้ goldId
+            console.log('Payment details:', payment);
+
+            if (payment && Array.isArray(payment) && payment.length > 0) {
+                const paymentData = payment[0];
+                console.log(paymentData);
+                document.getElementById('startDate').value = paymentData.startDate ? new Date(paymentData.startDate).toISOString().split('T')[0] : '';
+                document.getElementById('endDate').value = paymentData.endDate ? new Date(paymentData.endDate).toISOString().split('T')[0] : '';
+                document.getElementById('nextDueDate').value = paymentData.nextDueDate ? new Date(paymentData.nextDueDate).toISOString().split('T')[0] : '';
+                document.getElementById('amount').value = paymentData.amount;
+
+                // ค้นหาปุ่มยืนยันในฟอร์ม
+                const confirmButton = document.getElementById('confirmExtend'); // ใช้ getElementById แทน querySelector
+                if (confirmButton) { // ตรวจสอบว่าปุ่มไม่เป็น null
+                    confirmButton.onclick = () => confirmExtendPayment(goldId); // เรียกใช้ฟังก์ชันเมื่อกดปุ่ม
+                } else {
+                    console.error('ไม่พบปุ่มยืนยันในโมดัล');
+                }
+            } else {
+                console.error('ไม่มีข้อมูลการชำระเงินที่ถูกต้อง');
+            }
+        });
+
+
+
+        // // ดักฟังเหตุการณ์เมื่อโมดัล "ต่อดอก" เปิด
+        // document.getElementById('extendPaymentModal').addEventListener('show.bs.modal', async function(event) {
+        //     const button = event.relatedTarget; // รับปุ่มที่กด
+        //     const paymentId = button.getAttribute('data-payment-id'); // ดึง paymentId
+
+        //     // ดึงข้อมูลการชำระเงิน
+        //     const payment = await fetchPaymentDetails(paymentId);
+        //     console.log('Payment details:', payment); // เพิ่มบรรทัดนี้เพื่อตรวจสอบข้อมูล
+        //     // ตรวจสอบก่อนว่าข้อมูลเป็นอาร์เรย์และไม่ว่าง
+        //     if (payment && Array.isArray(payment) && payment.length > 0) {
+        //         const paymentData = payment[0]; // ดึงออบเจ็กต์ตัวแรกจากอาร์เรย์
+
+        //         document.getElementById('startDate').value = paymentData.startDate ? new Date(paymentData.startDate).toISOString().split('T')[0] : '';
+        //         document.getElementById('endDate').value = paymentData.endDate ? new Date(paymentData.endDate).toISOString().split('T')[0] : '';
+        //         document.getElementById('nextDueDate').value = paymentData.nextDueDate ? new Date(paymentData.nextDueDate).toISOString().split('T')[0] : '';
+        //         document.getElementById('amount').value = paymentData.amount;
+        //     } else {
+        //         console.error('ไม่มีข้อมูลการชำระเงินที่ถูกต้อง');
+        //     }
+
+        // });
+        // document.getElementById('confirmExtend').addEventListener('click', async function() {
+        //     const paymentId = document.getElementById('extendPaymentModal').getAttribute('data-payment-id');
+
+        //     try {
+        //         const payment = await extendPayment(paymentId); // เรียกฟังก์ชัน extendPayment เพื่ออัปเดตข้อมูล
+        //         alert('การต่อดอกเสร็จสิ้น');
+        //         // ปิด Modal หลังจากการยืนยัน
+        //         const modal = bootstrap.Modal.getInstance(document.getElementById('extendPaymentModal'));
+        //         modal.hide();
+        //     } catch (error) {
+        //         console.error('Error confirming extend:', error);
+        //         alert('เกิดข้อผิดพลาดในการต่อดอก');
+        //     }
+        // });
+
+    </script>
+</body>
+</html>

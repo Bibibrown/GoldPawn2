@@ -55,7 +55,10 @@
                         <td><%= customer.customerAddress %></td>
                         <td><%= customer.customerPhone %></td>
                         <td>
-                            <a href="" class="btn btn-info">ดู</a>
+                            <!-- แสดง list การจำนำ กดเพื่อดูรายละเอียดการจำนำแต่ละ ID -->
+                            <% customers.forEach(customer => { %>
+                                <a href=""><%= customer.pawnId %></a>
+                            <% }); %>
                         </td>
                     </tr>
                 <% }); %>

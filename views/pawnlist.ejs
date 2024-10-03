@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,37 +19,39 @@
         }
     </style>
 </head>
+
 <body>
     <%- include('./partials/nav.ejs') %>
 
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>ID จำนำ</th>
-                <th>วันที่จำนำ</th>
-                <th>ทองที่จำนำ</th>
-            </tr>
-        </thead>
-        <tbody>
-            <% if (customer.length === 0) { %>
+        <table class="table table-bordered">
+            <thead>
                 <tr>
-                    <td colspan="6" class="text-center">ไม่มีข้อมูลการจำนำ</td>
+                    <th>ID จำนำ</th>
+                    <th>วันที่จำนำ</th>
+                    <th>ทองที่จำนำ</th>
                 </tr>
-            <% } else { %>
-                <% pawns.forEach(pawn => { %>
+            </thead>
+            <tbody>
+                <% pawns.forEach(pawn=> { %>
                     <tr>
-                        <td><%= pawn.pawnId %></td>
-                        <td><%= pawn.pawnDate %></td>
                         <td>
-                            <!-- แสดงรายชื่อทองที่จำนำ กดเพื่อดูรายละเอียดทองแต่ละ ID -->
-                            <% pawns.forEach(pawn => { %>
-                                <a href=""><%= pawn.goldId %></a>
-                            <% }); %>
+                            <%= pawn.pawnId %>
+                        </td>
+                        <td>
+                            <%= pawn.pawnDate %>
+                        </td>
+                        <td>
+                            <!-- แสดง list ทองที่จำนำ กดเพื่อดูรายละเอียดธุรกรรมทองแต่ละ ID -->
+                            <% pawns.forEach(pawn=> { %>
+                                <a href="/pawn/gold-payment-history/<%= pawn.goldId %>">
+                                    <%= pawn.goldId %>
+                                </a>
+                                <% }); %>
                         </td>
                     </tr>
-                <% }); %>
-            <% } %>
-        </tbody>
-    </table>
+                    <% }); %>
+            </tbody>
+        </table>
 </body>
+
 </html>

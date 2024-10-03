@@ -67,13 +67,6 @@
                         <div class="col-sm-4">
                             <select class="form-select" id="goldType" required>
                                 <option value="">เลือกประเภท</option>
-                                <option value="กำไล">กำไล</option>
-                                <option value="จี้">จี้</option>
-                                <option value="ต่างหู">ต่างหู</option>
-                                <option value="สร้อยข้อเท้า">สร้อยข้อเท้า</option>
-                                <option value="สร้อยข้อมือ">สร้อยข้อมือ</option>
-                                <option value="สร้อยคอ">สร้อยคอ</option>
-                                <option value="แหวน">แหวน</option>
                             </select>
                         </div>        
                         <label for="weight" class="col-sm-2 col-form-label">น้ำหนัก</label>
@@ -101,10 +94,10 @@
                         </div>
                     </div>
                     <div class="mb-3 row">
-                        <label for="total" class="col-sm-2 col-form-label">ดอกเบี้ยต่อเดือน</label>
+                        <label for="intperm" class="col-sm-2 col-form-label">ดอกเบี้ยต่อเดือน</label>
                         <div class="col-sm">
                             <div class="input-group">
-                                <input type="number" class="form-control" id="total" readonly>
+                                <input type="number" class="form-control" id="intperm" readonly>
                                 <span class="input-group-text">บาท</span>
                             </div>
                         </div>
@@ -127,7 +120,7 @@
                 <table class="table table-bordered">
                     <thead>
                         <tr>
-                            <th>ID ทอง</th>
+                            <th>ID</th>
                             <th>ประเภท</th>
                             <th>น้ำหนัก</th>
                             <th>เงินต้น</th>
@@ -144,7 +137,7 @@
                                 <td><%= pawn.type %></td>
                                 <td><%= pawn.weight %></td>
                                 <td><%= pawn.principal %></td>
-                                <td><%= pawn.total %></td>
+                                <td><%= pawn.intperm %></td>
                                 <td><%= pawn.status %></td>
                             </tr>
                         <% }) %>
@@ -159,15 +152,15 @@
         // คำนวณดอกเบี้ยตามเปอร์เซ็นต์ที่กรอก
         function calculateTotal() {
             const principal = parseFloat(document.getElementById('principal').value) || 0; // เงินต้น
-            const principalPercent = parseFloat(document.getElementById('interest').value) || 0; // ดอกเบี้ย
+            const interestPercent = parseFloat(document.getElementById('interest').value) || 0; // ดอกเบี้ย
 
             if (principal < 0 || principalPercent < 0) {
                 alert("เงินต้นและดอกเบี้ยต้องไม่เป็นค่าลบ");
                 return;
             }
 
-            const interest = (principal * (principalPercent / 100)).toFixed(2); // คำนวณดอกเบี้ย
-            document.getElementById('total').value = interest; // แสดงผลในช่อง interest
+            const interest = (principal * (interestPercent / 100)).toFixed(2); // คำนวณดอกเบี้ย
+            document.getElementById('intperm').value = interest; // แสดงผลในช่อง interest
         }
 
         // ฟังก์ชันเพิ่มข้อมูลจำนำทองไปยังตาราง
@@ -180,7 +173,7 @@
                 <td>${pawn.type}</td>
                 <td>${pawn.weight}</td>
                 <td>${pawn.principal}</td>
-                <td>${pawn.total}</td>
+                <td>${pawn.intperm}</td>
                 <td>${pawn.status}</td>
 
             `;
@@ -209,7 +202,7 @@
             }
 
             // ส่งคำขอเพิ่มข้อมูลจำนำทองไปยังเซิร์ฟเวอร์
-            fetch('/pawn', { // ปรับเส้นทางเป็น '/pawn' ตาม router
+            fetch('/pawn', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
