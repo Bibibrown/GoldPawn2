@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,167 +9,216 @@
     <script src="/bootstrap/js/bootstrap.bundle.min.js"></script> <!-- ใช้ bundle version สำหรับ dependencies -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@200;300;400;500;600;700&display=swap"
+        rel="stylesheet">
     <style>
-        *{
+        * {
             font-family: "Mitr", sans-serif;
             font-weight: 400;
             font-style: normal;
         }
+
         .vertical-divider {
             border-left: 3px solid lightgray;
             height: 100%;
         }
+
+        .table-wrapper {
+            max-height: 300px;
+            /* กำหนดความสูงสูงสุดของตาราง */
+            overflow-y: auto;
+            /* เปิดใช้งานการเลื่อนในแนวตั้ง */
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            /* ให้ขอบตารางรวมกัน */
+        }
+
+        thead th {
+            position: sticky;
+            top: 0;
+            background-color: #fff;
+            /* กำหนดพื้นหลังสำหรับส่วนหัว */
+            z-index: 1;
+        }
     </style>
 </head>
+
 <body>
     <%- include('./partials/nav.ejs') %>
 
-    <nav class="breadcrumb-nav fixed-top bg-light" style="--bs-breadcrumb-divider: '>'; margin-top: 59px;" aria-label="breadcrumb">
-        <ol class="breadcrumb m-2">
-            <li class="breadcrumb-item"><a href="/">หน้าหลัก</a></li>
-            <li class="breadcrumb-item"><a href="/customer/<%= customer.customerId %>">ข้อมูลลูกค้า</a></li>
-            <li class="breadcrumb-item active" aria-current="page">เพิ่มข้อมูลจำนำทอง</li>
-        </ol>
-    </nav>
+        <nav class="breadcrumb-nav fixed-top bg-light" style="--bs-breadcrumb-divider: '>'; margin-top: 59px;"
+            aria-label="breadcrumb">
+            <ol class="breadcrumb m-2">
+                <li class="breadcrumb-item"><a href="/">หน้าหลัก</a></li>
+                <li class="breadcrumb-item"><a href="/customer/<%= customer.customerId %>">ข้อมูลลูกค้า</a></li>
+                <li class="breadcrumb-item active" aria-current="page">เพิ่มข้อมูลจำนำทอง</li>
+            </ol>
+        </nav>
 
-    <div class="container" style="margin-top: 7.7%;">
-        <div class="row">
-            <!-- ส่วนสำหรับฟอร์มกรอกข้อมูลจำนำทอง -->
-            <div class="col-md-5">
-                <h2>เพิ่มข้อมูลจำนำทอง</h2>
-                <form id="goldPawnForm" action="/pawn/addpawn" method="POST">
-                    <h4 class="mb-3">รายละเอียดลูกค้า</h4>
-                    <div class="mb-3 row">
-                        <label for="customerId" class="col-sm-2 col-form-label">ID ลูกค้า</label>
-                        <div class="col-sm">
-                            <input type="text" class="form-control" id="customerId" name="customerId" value="<%= customer.customerId %>" readonly>
-                        </div>
-                    </div>
-                    <div class="mb-3 row">
-                        <label for="customerFName" class="col-sm-2 col-form-label">ชื่อ</label>
-                        <div class="col-sm-4">
-                            <input type="text" class="form-control" id="customerFName" value="<%= customer.customerFName %>" readonly>
-                        </div>
-                        <label for="customerLName" class="col-sm-2 col-form-label">นามสกุล</label>
-                        <div class="col-sm-4">
-                            <input type="text" class="form-control" id="customerLName" value="<%= customer.customerLName %>" readonly>
-                        </div>
-                    </div>
-                    <h4 class="mb-3">รายละเอียดทอง</h4>
-                    <div class="mb-3 row">
-                        <label for="goldId" class="col-sm-2 col-form-label">ID ทอง</label>
-                        <div class="col-sm">
-                            <input type="text" class="form-control" id="goldId" name="goldId" value="<%= newGoldId %>" readonly>
-                        </div>
-                    </div>
-                    <div class="mb-3 row">
-                        <label for="typeName" class="col-sm-2 col-form-label">ประเภท</label>
-                        <div class="col-sm-4">
-                            <select class="form-select" id="typeName" name="typeName" required>
-                                <option value="">เลือกประเภท</option>
-                                <% typeList.forEach(function(type) { %>
-                                    <option value="<%= type._id %>"><%= type.typeName %></option>
-                                <% }) %>
-                            </select>
-                        </div>        
-                        <label for="weight" class="col-sm-2 col-form-label">น้ำหนัก</label>
-                        <div class="col-sm-4">
-                            <div class="input-group">
-                                <input type="number" class="form-control" id="weight" name="weight" step="0.01" min="0.01" required>
-                                <span class="input-group-text">กรัม</span>
+        <div class="container" style="margin-top: 7.7%;">
+            <div class="row">
+                <!-- ส่วนสำหรับฟอร์มกรอกข้อมูลจำนำทอง -->
+                <div class="col-md-5">
+                    <h2>เพิ่มข้อมูลจำนำทอง</h2>
+                    <form id="goldPawnForm" action="/pawn/addpawn" method="POST">
+                        <h4 class="mb-3">รายละเอียดลูกค้า</h4>
+                        <div class="mb-3 row">
+                            <label for="customerId" class="col-sm-2 col-form-label">ID ลูกค้า</label>
+                            <div class="col-sm">
+                                <input type="text" class="form-control" id="customerId" name="customerId"
+                                    value="<%= customer.customerId %>" readonly>
                             </div>
                         </div>
-                    </div>
-                    <div class="mb-3 row">
-                        <label for="principal" class="col-sm-2 col-form-label">เงินต้น</label>
-                        <div class="col-sm">
-                            <div class="input-group">
-                                <input type="number" class="form-control" id="principal" name="principal" min="0" oninput="calculateTotal()" required>
-                                <span class="input-group-text">บาท</span>
+                        <div class="mb-3 row">
+                            <label for="customerFName" class="col-sm-2 col-form-label">ชื่อ</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control" id="customerFName"
+                                    value="<%= customer.customerFName %>" readonly>
+                            </div>
+                            <label for="customerLName" class="col-sm-2 col-form-label">นามสกุล</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control" id="customerLName"
+                                    value="<%= customer.customerLName %>" readonly>
                             </div>
                         </div>
-                        <label for="interest" class="col-sm-2 col-form-label">ดอกเบี้ย</label>
-                        <div class="col-sm">
-                            <div class="input-group">
-                                <input type="number" class="form-control" id="interest" name="interest" step="0.01" oninput="calculateTotal()" required>
-                                <span class="input-group-text">%</span>
+                        <h4 class="mb-3">รายละเอียดทอง</h4>
+                        <div class="mb-3 row">
+                            <label for="goldId" class="col-sm-2 col-form-label">ID ทอง</label>
+                            <div class="col-sm">
+                                <input type="text" class="form-control" id="goldId" name="goldId"
+                                    value="<%= newGoldId %>" readonly>
                             </div>
                         </div>
-                    </div>
-                    <div class="mb-3 row">
-                        <label for="intperm" class="col-sm-2 col-form-label">ดอกเบี้ยต่อเดือน</label>
-                        <div class="col-sm">
-                            <div class="input-group">
-                                <input type="number" class="form-control" id="intperm" name="intperm" readonly>
-                                <span class="input-group-text">บาท</span>
+                        <div class="mb-3 row">
+                            <label for="typeName" class="col-sm-2 col-form-label">ประเภท</label>
+                            <div class="col-sm-4">
+                                <select class="form-select" id="typeName" name="typeName" required>
+                                    <option value="">เลือกประเภท</option>
+                                    <% typeList.forEach(function(type) { %>
+                                        <option value="<%= type._id %>">
+                                            <%= type.typeName %>
+                                        </option>
+                                        <% }) %>
+                                </select>
+                            </div>
+                            <label for="weight" class="col-sm-2 col-form-label">น้ำหนัก</label>
+                            <div class="col-sm-4">
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="weight" name="weight" step="0.01"
+                                        min="0.01" required>
+                                    <span class="input-group-text">กรัม</span>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="d-flex justify-content-end">
-                        <button type="reset" class="btn btn-secondary me-2">ล้าง</button>
-                        <button type="submit" class="btn btn-success">ยืนยัน</button>
-                    </div>
-                </form>
-            </div>
+                        <div class="mb-3 row">
+                            <label for="principal" class="col-sm-2 col-form-label">เงินต้น</label>
+                            <div class="col-sm">
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="principal" name="principal" min="0"
+                                        oninput="calculateTotal()" required>
+                                    <span class="input-group-text">บาท</span>
+                                </div>
+                            </div>
+                            <label for="interest" class="col-sm-2 col-form-label">ดอกเบี้ย</label>
+                            <div class="col-sm">
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="interest" name="interest" step="0.01"
+                                        oninput="calculateTotal()" required>
+                                    <span class="input-group-text">%</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3 row">
+                            <label for="intperm" class="col-sm-2 col-form-label">ดอกเบี้ยต่อเดือน</label>
+                            <div class="col-sm">
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="intperm" name="intperm" readonly>
+                                    <span class="input-group-text">บาท</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-end">
+                            <button type="reset" class="btn btn-secondary me-2">ล้าง</button>
+                            <button type="submit" class="btn btn-success">ยืนยัน</button>
+                        </div>
+                    </form>
+                </div>
 
-            <!-- เส้นคั่นกลางแนวตั้ง -->
-            <div class="col-md-1 d-flex align-items-center justify-content-center">
-                <div class="vertical-divider"></div>
-            </div>
+                <!-- เส้นคั่นกลางแนวตั้ง -->
+                <div class="col-md-1 d-flex align-items-center justify-content-center">
+                    <div class="vertical-divider"></div>
+                </div>
 
-            <!-- ส่วนสำหรับแสดงตารางประวัติการจำนำ -->
-            <div class="col-md-6">
-                <h2>ทองที่จำนำ</h2>
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>ประเภท</th>
-                            <th>น้ำหนัก</th>
-                            <th>เงินต้น</th>
-                            <th>ดอกเบี้ยต่อเดือน</th>
-                            <th>สถานะ</th>
-                        </tr>
-                    </thead>
-                    <tbody id="pawnHistoryTable">
-                        <% pawns.forEach(function(pawn) { %>
-                            <% pawn.goldId.forEach(function(gold) { %>
+                <!-- ส่วนสำหรับแสดงตารางประวัติการจำนำ -->
+                <div class="col-md-6">
+                    <h2>ทองที่จำนำ</h2>
+                    <div class="table-wrapper">
+                        <table class="table table-bordered">
+                            <thead>
                                 <tr>
-                                    <td>
-                                        <a href="/pawn/gold-payment-history/<%= gold.goldId %>"><%= gold.goldId %></a>
-                                    </td>
-                                    <td><%= gold.typeName.typeName %></td>
-                                    <td><%= gold.weight %> กรัม</td>
-                                    <td><%= gold.principal %> บาท</td>
-                                    <td><%= gold.intperm %> บาท</td>
-                                    <td><%= gold.status %></td>
+                                    <th>ID</th>
+                                    <th>ประเภท</th>
+                                    <th>น้ำหนัก</th>
+                                    <th>เงินต้น</th>
+                                    <th>ดอกเบี้ยต่อเดือน</th>
+                                    <th>สถานะ</th>
                                 </tr>
-                            <% }) %>
-                        <% }) %>
-                    </tbody>
-                </table>
+                            </thead>
+                            <tbody id="pawnHistoryTable">
+                                <% pawns.forEach(function(pawn) { %>
+                                    <% pawn.goldId.forEach(function(gold) { %>
+                                        <tr>
+                                            <td>
+                                                <a href="/pawn/gold-payment-history/<%= gold.goldId %>">
+                                                    <%= gold.goldId %>
+                                                </a>
+                                            </td>
+                                            <td>
+                                                <%= gold.typeName.typeName %>
+                                            </td>
+                                            <td>
+                                                <%= gold.weight %> กรัม
+                                            </td>
+                                            <td>
+                                                <%= gold.principal %> บาท
+                                            </td>
+                                            <td>
+                                                <%= gold.intperm %> บาท
+                                            </td>
+                                            <td>
+                                                <%= gold.status %>
+                                            </td>
+                                        </tr>
+                                        <% }) %>
+                                            <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-    <footer class="mt-5"></footer>
+        <footer class="mt-5"></footer>
 
-    <script>
-        // คำนวณดอกเบี้ยตามเปอร์เซ็นต์ที่กรอก
-        function calculateTotal() {
-            const principal = parseFloat(document.getElementById('principal').value) || 0; // เงินต้น
-            const interestPercent = parseFloat(document.getElementById('interest').value) || 0; // ดอกเบี้ย
+        <script>
+            // คำนวณดอกเบี้ยตามเปอร์เซ็นต์ที่กรอก
+            function calculateTotal() {
+                const principal = parseFloat(document.getElementById('principal').value) || 0; // เงินต้น
+                const interestPercent = parseFloat(document.getElementById('interest').value) || 0; // ดอกเบี้ย
 
-            if (principal < 0 || interestPercent < 0) {
-                alert("เงินต้นและดอกเบี้ยต้องไม่เป็นค่าลบ");
-                return;
+                if (principal < 0 || interestPercent < 0) {
+                    alert("เงินต้นและดอกเบี้ยต้องไม่เป็นค่าลบ");
+                    return;
+                }
+
+                const interest = (principal * (interestPercent / 100)).toFixed(2); // คำนวณดอกเบี้ย
+                document.getElementById('intperm').value = interest; // แสดงผลในช่อง intperm
             }
 
-            const interest = (principal * (interestPercent / 100)).toFixed(2); // คำนวณดอกเบี้ย
-            document.getElementById('intperm').value = interest; // แสดงผลในช่อง intperm
-        }
-
-        // ไม่จำเป็นต้องใช้ JavaScript สำหรับการส่งฟอร์ม เพราะใช้การส่งแบบธรรมดาแล้ว
-    </script>
+            // ไม่จำเป็นต้องใช้ JavaScript สำหรับการส่งฟอร์ม เพราะใช้การส่งแบบธรรมดาแล้ว
+        </script>
 </body>
+
 </html>
