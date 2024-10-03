@@ -201,6 +201,7 @@
     document.getElementById('clearButton2').addEventListener('click', function () {
         // ล้างฟิลด์ชื่อประเภททอง
         document.getElementById('typeName').value = '';
+        // คุณสามารถเพิ่มฟังก์ชันเพิ่มเติมที่ต้องการให้ทำงานเมื่อกดล้าง เช่น
         fetchLatestTypeId(); // ดึง typeId ล่าสุด
         loadGoldTypes(); // โหลดข้อมูลประเภททอง
     });
