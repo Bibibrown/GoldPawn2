@@ -8,7 +8,7 @@ const createError = require('http-errors');
 const indexRouter = require('./routes/index');
 const customersRoute = require('./routes/customer');
 const pawnRouter = require('./routes/pawn');
-
+const addDataRouter = require('./routes/addData');
 
 const app = express();
 const port = 3000; // กำหนดพอร์ตที่ต้องการใช้
@@ -32,7 +32,7 @@ app.use('/bootstrap', express.static(path.join(__dirname, 'node_modules', 'boots
 app.use('/', indexRouter);
 app.use('/customer', customersRoute);
 app.use('/pawn', pawnRouter);
-
+app.use('/add-data', addDataRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
