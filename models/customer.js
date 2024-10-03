@@ -28,7 +28,7 @@ const customerSchema = new Schema({
         type: [String], 
         required: false 
     }
-});
+}, { timestamps: true });
 
 const Customer = mongoose.model('Customer', customerSchema);
 module.exports = Customer;
