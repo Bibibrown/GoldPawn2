@@ -5,17 +5,6 @@ const Pawn = require('../models/goldPawn');
 const Payment = require('../models/payment');
 
 
-// ตัวอย่างการสร้าง Pawn ใหม่
-const newPawn = new Pawn({
-    customerId: '1234567890123' // ค่า customerId
-  });
-  
-  // บันทึก Pawn ลงในฐานข้อมูล
-  newPawn.save()
-    .then(() => console.log('Pawn saved with auto-generated ID:', newPawn.pawnId))
-    .catch(err => console.log('Error:', err));
-
-
 // // เส้นทางเพื่อแสดงหน้า Add Gold Pawn สำหรับลูกค้า
 // router.get('/addpawn/:customerId', async (req, res) => {
 //     const { customerId } = req.params;
