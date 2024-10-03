@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="th">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,52 +19,69 @@
         }
     </style>
 </head>
+
 <body>
     <%- include('./partials/nav.ejs') %>
 
-    <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
-        <ol class="breadcrumb m-3">
-            <li class="breadcrumb-item"><a href="/">หน้าหลัก</a></li>
-            <li class="breadcrumb-item active" aria-current="page">รายชื่อลูกค้า</a></li>
-        </ol>
-    </nav>
+        <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+            <ol class="breadcrumb m-3">
+                <li class="breadcrumb-item"><a href="/">หน้าหลัก</a></li>
+                <li class="breadcrumb-item active" aria-current="page">รายชื่อลูกค้า</li>
+            </ol>
+        </nav>
 
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>ID ลูกค้า</th>
-                <th>ชื่อ</th>
-                <th>นามสกุล</th>
-                <th>ที่อยู่</th>
-                <th>เบอร์โทร</th>
-                <th>ข้อมูลจำนำ</th>
-            </tr>
-        </thead>
-        <tbody>
-            <% if (customer.length === 0) { %>
-                <tr>
-                    <td colspan="6" class="text-center">ไม่มีข้อมูลลูกค้า</td>
-                </tr>
-            <% } else { %>
-                <% customers.forEach(customer => { %>
+        <div class="container mt-4">
+            <table class="table table-bordered">
+                <thead>
                     <tr>
-                        <td>
-                            <a href="/customer/<%= customer.customerId %>"><%= customer.customerId %></a>
-                        </td>
-                        <td><%= customer.customerFName %></td>
-                        <td><%= customer.customerLName %></td>
-                        <td><%= customer.customerAddress %></td>
-                        <td><%= customer.customerPhone %></td>
-                        <td>
-                            <!-- แสดง list การจำนำ กดเพื่อดูรายละเอียดการจำนำแต่ละ ID -->
-                            <% customers.forEach(customer => { %>
-                                <a href=""><%= customer.pawnId %></a>
-                            <% }); %>
-                        </td>
+                        <th>ID ลูกค้า</th>
+                        <th>ชื่อ</th>
+                        <th>นามสกุล</th>
+                        <th>ที่อยู่</th>
+                        <th>เบอร์โทร</th>
+                        <th>ข้อมูลจำนำ</th>
                     </tr>
-                <% }); %>
-            <% } %>
-        </tbody>
-    </table>
+                </thead>
+                <tbody>
+                    <% if (customers.length===0) { %>
+                        <tr>
+                            <td colspan="6" class="text-center">ไม่มีข้อมูลลูกค้า</td>
+                        </tr>
+                        <% } else { %>
+                            <% customers.forEach(customer=> { %>
+                                <tr>
+                                    <td>
+                                        <%= customer.customerId %>
+                                    </td>
+                                    <td>
+                                        <%= customer.customerFName %>
+                                    </td>
+                                    <td>
+                                        <%= customer.customerLName %>
+                                    </td>
+                                    <td>
+                                        <%= customer.customerAddress %>
+                                    </td>
+                                    <td>
+                                        <%= customer.customerPhone %>
+                                    </td>
+                                    <td>
+                                        <% if (customer.pawnId && customer.pawnId.length> 0) { %>
+                                            <% customer.pawnId.forEach(pawn=> { %>
+                                                <a href="/pawn/<%= pawn %>">
+                                                    <%= pawn %>
+                                                </a><br>
+                                                <% }); %>
+                                                    <% } else { %>
+                                                        <span>ไม่มีข้อมูลจำนำ</span>
+                                                        <% } %>
+                                    </td>
+                                </tr>
+                                <% }); %>
+                                    <% } %>
+                </tbody>
+            </table>
+        </div>
 </body>
+
 </html>
