@@ -180,9 +180,7 @@
             },
             body: JSON.stringify(newGoldTypeData)
         })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Success:', data);
+            .then(response => {
                 // ล้างฟอร์ม
                 goldTypeForm.reset();
                 fetchLatestTypeId(); // ดึง typeId ล่าสุด
