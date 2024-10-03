@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เพิ่มข้อมูลลูกค้าใหม่</title>
+    <link rel='stylesheet' href="/bootstrap/css/bootstrap.min.css" />
+    <script src="/bootstrap/js/bootstrap.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: "Mitr", sans-serif;
+            font-weight: 400;
+            font-style: normal;
+        }
+
+        .container {
+            width: 50%;
+        }
+    </style>
+</head>
+
+<body>
+    <%- include('./partials/nav.ejs') %>
+
+    <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+        <ol class="breadcrumb m-3">
+            <li class="breadcrumb-item"><a href="/">หน้าหลัก</a></li>
+            <li class="breadcrumb-item active" aria-current="page">เพิ่มข้อมูลลูกค้าใหม่</li>
+        </ol>
+    </nav>
+    
+    <div class="container mt-4">
+        <h2>เพิ่มข้อมูลลูกค้าใหม่</h2>
+        <form id="customerForm" class="mt-4">
+            <div class="row mb-3">
+                <label for="customerId" class="col-sm-2 col-form-label">ID ลูกค้า</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" id="customerId" readonly>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label for="customerFName" class="col-sm-2 col-form-label">ชื่อ</label>
+                <div class="col-sm-4">
+                    <input type="text" class="form-control" id="customerFName" required>
+                </div>
+                <label for="customerLName" class="col-sm-2 col-form-label">นามสกุล</label>
+                <div class="col-sm-4">
+                    <input type="text" class="form-control" id="customerLName" required>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label for="customerAddress" class="col-sm-2 col-form-label">ที่อยู่</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" id="customerAddress" required>
+                </div>
+            </div>
+            <div class="row mb-3">
+                <label for="customerPhone" class="col-sm-2 col-form-label">เบอร์โทร</label>
+                <div class="col-sm-10">
+                    <input type="text" class="form-control" id="customerPhone" required pattern="^\d{10}$" title="เบอร์โทรต้องมี 10 หลัก">
+                </div>
+            </div>
+            <div class="d-flex justify-content-center mt-5">
+                <button type="button" class="btn btn-success me-2" id="addCustomerButton">ยืนยันเพิ่มข้อมูลลูกค้าใหม่</button>
+            </div>
+        </form>
+    </div>
+
+    <footer class="mt-5"></footer>
+    
+    <script>
+        // ดึง customerId จาก URL และแสดงในฟอร์ม
+        document.addEventListener('DOMContentLoaded', function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            const customerId = urlParams.get('customerID'); // สมมติว่า customerID ถูกส่งมากับ URL
+            document.getElementById('customerId').value = customerId || '';
+        });
+
+        document.getElementById('addCustomerButton').addEventListener('click', function () {
+            // ตรวจสอบว่าข้อมูลครบถ้วนหรือไม่
+            const customerForm = document.getElementById('customerForm');
+            if (!customerForm.checkValidity()) {
+                customerForm.reportValidity();
+                return;
+            }
+
+            const newCustomerData = {
+                customerId: document.getElementById('customerId').value,
+                customerFName: document.getElementById('customerFName').value,
+                customerLName: document.getElementById('customerLName').value,
+                customerAddress: document.getElementById('customerAddress').value,
+                customerPhone: document.getElementById('customerPhone').value
+            };
+
+            // ส่งข้อมูลลูกค้าใหม่ไปยังเซิร์ฟเวอร์
+            fetch('/customer', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(newCustomerData)
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('เกิดข้อผิดพลาดในการเพิ่มข้อมูลลูกค้า');
+                alert('เพิ่มข้อมูลลูกค้าเรียบร้อย');
+                
+                // นำไปยังหน้าข้อมูลลูกค้าใหม่
+                window.location.href = `/customer/${newCustomerData.customerId}`;
+            })
+            .catch(err => {
+                alert(err.message);
+            });
+        });
+    </script>
+
+</body>
+
+</html>

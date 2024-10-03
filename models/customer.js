@@ -6,7 +6,7 @@ const customerSchema = new Schema({
         type: String,
         required: true,
         unique: true,
-        match: [/^\d{13}$/, 'Customer ID ต้องเป็นเลขบัตรประชาชน 13 หลัก'],
+        match: [/^\d{13}$/, 'Customer ID ต้องเป็นเลขบัตรประชาชน 13 หลัก']
     },
     customerFName: {
         type: String,
@@ -22,7 +22,8 @@ const customerSchema = new Schema({
     },
     customerPhone: {
         type: String,
-        required: true
+        required: true,
+        match: [/^\d{10}$/]
     }
 });
 
