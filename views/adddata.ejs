@@ -9,7 +9,8 @@
     <script src="/bootstrap/js/bootstrap.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@200;300;400;500;600;700&display=swap"
+        rel="stylesheet">
     <style>
         * {
             font-family: "Mitr", sans-serif;
@@ -27,99 +28,100 @@
 <body>
     <%- include('./partials/nav.ejs') %>
 
-    <nav class="breadcrumb-nav fixed-top bg-light" style="--bs-breadcrumb-divider: '>'; margin-top: 56px;" aria-label="breadcrumb">
-        <ol class="breadcrumb m-2">
-            <li class="breadcrumb-item"><a href="/">หน้าหลัก</a></li>
-            <li class="breadcrumb-item active" aria-current="page">เพิ่มข้อมูล</li>
-        </ol>
-    </nav>    
+        <nav class="breadcrumb-nav fixed-top bg-light" style="--bs-breadcrumb-divider: '>'; margin-top: 56px;"
+            aria-label="breadcrumb">
+            <ol class="breadcrumb m-2">
+                <li class="breadcrumb-item"><a href="/">หน้าหลัก</a></li>
+                <li class="breadcrumb-item active" aria-current="page">เพิ่มข้อมูล</li>
+            </ol>
+        </nav>
 
-    <div class="container" style="margin-top: 7.7%;">
-        <div class="row">
-            <!-- ส่วนสำหรับฟอร์มกรอกข้อมูลลูกค้า -->
-            <div class="col-md-5">
-                <h2>เพิ่มข้อมูลลูกค้าใหม่</h2>
-                <form id="customerForm" class="mt-4">
-                    <div class="row mb-3">
-                        <label for="customerId" class="col-sm-2 col-form-label">ID ลูกค้า</label>
-                        <div class="col-sm-10">
-                            <input type="text" class="form-control" id="customerId" required pattern="^\d{13}$"
-                                title="ID ลูกค้าต้องเป็นเลขบัตรประชาชน 13 หลัก">
+        <div class="container" style="margin-top: 7.7%;">
+            <div class="row">
+                <!-- ส่วนสำหรับฟอร์มกรอกข้อมูลลูกค้า -->
+                <div class="col-md-5">
+                    <h2>เพิ่มข้อมูลลูกค้าใหม่</h2>
+                    <form id="customerForm" class="mt-3">
+                        <div class="row mb-3">
+                            <label for="customerId" class="col-sm-2 col-form-label">ID ลูกค้า</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="customerId" required pattern="^\d{13}$"
+                                    title="ID ลูกค้าต้องเป็นเลขบัตรประชาชน 13 หลัก">
+                            </div>
                         </div>
-                    </div>
-                    <div class="row mb-3">
-                        <label for="customerFName" class="col-sm-2 col-form-label">ชื่อ</label>
-                        <div class="col-sm-4">
-                            <input type="text" class="form-control" id="customerFName" required>
+                        <div class="row mb-3">
+                            <label for="customerFName" class="col-sm-2 col-form-label">ชื่อ</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control" id="customerFName" required>
+                            </div>
+                            <label for="customerLName" class="col-sm-2 col-form-label">นามสกุล</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control" id="customerLName" required>
+                            </div>
                         </div>
-                        <label for="customerLName" class="col-sm-2 col-form-label">นามสกุล</label>
-                        <div class="col-sm-4">
-                            <input type="text" class="form-control" id="customerLName" required>
+                        <div class="row mb-3">
+                            <label for="customerAddress" class="col-sm-2 col-form-label">ที่อยู่</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="customerAddress" required>
+                            </div>
                         </div>
-                    </div>
-                    <div class="row mb-3">
-                        <label for="customerAddress" class="col-sm-2 col-form-label">ที่อยู่</label>
-                        <div class="col-sm-10">
-                            <input type="text" class="form-control" id="customerAddress" required>
+                        <div class="row mb-3">
+                            <label for="customerPhone" class="col-sm-2 col-form-label">เบอร์โทร</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="customerPhone" required pattern="^\d{10}$"
+                                    title="เบอร์โทรต้องมี 10 หลัก">
+                            </div>
                         </div>
-                    </div>
-                    <div class="row mb-3">
-                        <label for="customerPhone" class="col-sm-2 col-form-label">เบอร์โทร</label>
-                        <div class="col-sm-10">
-                            <input type="text" class="form-control" id="customerPhone" required pattern="^\d{10}$"
-                                title="เบอร์โทรต้องมี 10 หลัก">
+                        <div class="d-flex justify-content-end">
+                            <button type="button" class="btn btn-secondary me-2" id="clearButton1">ล้าง</button>
+                            <button type="button" class="btn btn-success" id="addCustomerButton">ยืนยัน</button>
                         </div>
-                    </div>
-                    <div class="d-flex justify-content-end">
-                        <button type="button" class="btn btn-secondary me-2" id="clearButton1">ล้าง</button>
-                        <button type="button" class="btn btn-success" id="addCustomerButton">ยืนยัน</button>
-                    </div>
-                </form>
-            </div>
-            <!-- เส้นคั่นกลางแนวตั้ง -->
-            <div class="col-md-1 d-flex align-items-center justify-content-center">
-                <div class="vertical-divider"></div>
-            </div>
+                    </form>
+                </div>
+                <!-- เส้นคั่นกลางแนวตั้ง -->
+                <div class="col-md-1 d-flex align-items-center justify-content-center">
+                    <div class="vertical-divider"></div>
+                </div>
 
-            <!-- ส่วนสำหรับฟอร์มกรอกประเภททอง -->
-            <div class="col-md-6">
-                <h2>เพิ่มข้อมูลประเภททอง</h2>
-                <form id="goldTypeForm" class="mt-4">
-                    <div class="row mb-3">
-                        <label for="typeId" class="col-sm-3 col-form-label">ID ประเภท</label>
-                        <div class="col-sm-9">
-                            <input type="text" class="form-control" id="typeId" required readonly>
+                <!-- ส่วนสำหรับฟอร์มกรอกประเภททอง -->
+                <div class="col-md-6">
+                    <h2>เพิ่มประเภททอง</h2>
+                    <form id="goldTypeForm" class="mt-3">
+                        <div class="row mb-3">
+                            <label for="typeId" class="col-sm-3 col-form-label">ID ประเภท</label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" id="typeId" required readonly>
+                            </div>
                         </div>
-                    </div>
-                    <div class="row mb-3">
-                        <label for="typeName" class="col-sm-3 col-form-label">ชื่อประเภททอง</label>
-                        <div class="col-sm-9">
-                            <input type="text" class="form-control" id="typeName" required>
+                        <div class="row mb-3">
+                            <label for="typeName" class="col-sm-3 col-form-label">ชื่อประเภททอง</label>
+                            <div class="col-sm-9">
+                                <input type="text" class="form-control" id="typeName" required>
+                            </div>
                         </div>
-                    </div>
-                    <div class="d-flex justify-content-end">
-                        <button type="button" class="btn btn-secondary me-2" id="clearButton2">ล้าง</button>
-                        <button type="button" class="btn btn-success" id="addTypeButton">ยืนยัน</button>
-                    </div>
-                </form>
+                        <div class="d-flex justify-content-end">
+                            <button type="button" class="btn btn-secondary me-2" id="clearButton2">ล้าง</button>
+                            <button type="button" class="btn btn-success" id="addTypeButton">ยืนยัน</button>
+                        </div>
+                    </form>
 
-                <h2 class="mt-4">ข้อมูลประเภททอง</h2>
-                <table class="table table-bordered">
-                    <thead>
-                        <tr>
-                            <th>ID ประเภท</th>
-                            <th>ชื่อประเภททอง</th>
-                        </tr>
-                    </thead>
-                    <tbody id="goldTypeTableBody">
-                        <!-- ข้อมูลประเภททองจะถูกเพิ่มที่นี่ -->
-                    </tbody>
-                </table>
+                    <h2 class="mt-4">ประเภททองทั้งหมด: <%= types.length %> ประเภท</h2>
+                    <table class="table table-bordered mt-3">
+                        <thead>
+                            <tr>
+                                <th>ID ประเภท</th>
+                                <th>ชื่อประเภททอง</th>
+                            </tr>
+                        </thead>
+                        <tbody id="goldTypeTableBody">
+                            <!-- ข้อมูลประเภททองจะถูกเพิ่มที่นี่ -->
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
-    </div>
 
-    <footer class="mt-5"></footer>
+        <footer class="mt-5"></footer>
 </body>
 
 <script>
@@ -140,22 +142,22 @@
         };
 
         // ส่งข้อมูลลูกค้าไปยังเซิร์ฟเวอร์
-        fetch('/customers', {
+        fetch('/customer', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify(newCustomerData)
         })
-        .then(response => response.json())
-        .then(data => {
-            console.log('Success:', data);
-            // ล้างฟอร์ม
-            customerForm.reset();
-        })
-        .catch((error) => {
-            console.error('Error:', error);
-        });
+            .then(response => {
+                if (!response.ok) throw new Error('เกิดข้อผิดพลาดในการเพิ่มข้อมูลลูกค้า');
+                alert('เพิ่มข้อมูลลูกค้าเรียบร้อย');
+                // ล้างฟอร์ม
+                customerForm.reset();
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
     });
 
     document.getElementById('addTypeButton').addEventListener('click', function () {
@@ -178,17 +180,15 @@
             },
             body: JSON.stringify(newGoldTypeData)
         })
-        .then(response => response.json())
-        .then(data => {
-            console.log('Success:', data);
-            // ล้างฟอร์ม
-            goldTypeForm.reset();
-            fetchLatestTypeId(); // ดึง typeId ล่าสุด
-            loadGoldTypes(); // โหลดข้อมูลประเภททอง
-        })
-        .catch((error) => {
-            console.error('Error:', error);
-        });
+            .then(response => {
+                // ล้างฟอร์ม
+                goldTypeForm.reset();
+                fetchLatestTypeId(); // ดึง typeId ล่าสุด
+                loadGoldTypes(); // โหลดข้อมูลประเภททอง
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
     });
 
     document.getElementById('clearButton1').addEventListener('click', function () {
@@ -196,7 +196,11 @@
     });
 
     document.getElementById('clearButton2').addEventListener('click', function () {
-        document.getElementById('goldTypeForm').reset();
+        // ล้างฟิลด์ชื่อประเภททอง
+        document.getElementById('typeName').value = '';
+        // คุณสามารถเพิ่มฟังก์ชันเพิ่มเติมที่ต้องการให้ทำงานเมื่อกดล้าง เช่น
+        fetchLatestTypeId(); // ดึง typeId ล่าสุด
+        loadGoldTypes(); // โหลดข้อมูลประเภททอง
     });
 
     // ฟังก์ชันสำหรับดึง typeId ล่าสุด
@@ -229,6 +233,7 @@
                 `;
                 tableBody.appendChild(row);
             });
+            
         } catch (error) {
             console.error('Error loading gold types:', error);
         }

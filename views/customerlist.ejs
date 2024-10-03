@@ -9,8 +9,7 @@
     <script src="/bootstrap/js/bootstrap.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@200;300;400;500;600;700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             font-family: "Mitr", sans-serif;
@@ -30,59 +29,85 @@
         </ol>
     </nav>
 
-        <div class="container" style="margin-top: 7.7%;">
-            <h2>รายชื่อลูกค้า</h2>
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>ID ลูกค้า</th>
-                        <th>ชื่อ</th>
-                        <th>นามสกุล</th>
-                        <th>ที่อยู่</th>
-                        <th>เบอร์โทร</th>
-                        <th>ข้อมูลจำนำ</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <% if (customers.length===0) { %>
-                        <tr>
-                            <td colspan="6" class="text-center">ไม่มีข้อมูลลูกค้า</td>
-                        </tr>
-                        <% } else { %>
-                            <% customers.forEach(customer=> { %>
-                                <tr>
-                                    <td>
-                                        <a href="/customer/<%= customer.customerId %>"><%= customer.customerId %></a>
-                                    </td>
-                                    <td>
-                                        <%= customer.customerFName %>
-                                    </td>
-                                    <td>
-                                        <%= customer.customerLName %>
-                                    </td>
-                                    <td>
-                                        <%= customer.customerAddress %>
-                                    </td>
-                                    <td>
-                                        <%= customer.customerPhone %>
-                                    </td>
-                                    <td>
-                                        <% if (customer.pawnId && customer.pawnId.length> 0) { %>
-                                            <% customer.pawnId.forEach(pawn=> { %>
-                                                <a href="/pawn/<%= pawn %>">
-                                                    <%= pawn %>
-                                                </a><br>
-                                                <% }); %>
-                                                    <% } else { %>
-                                                        <span>ไม่มีข้อมูลจำนำ</span>
-                                                        <% } %>
-                                    </td>
-                                </tr>
-                                <% }); %>
-                                    <% } %>
-                </tbody>
-            </table>
+    <div class="container" style="margin-top: 7.7%;">
+        <h2>รายชื่อลูกค้าทั้งหมด: <%= customers.length %> คน</h2>
+        <div class="mb-3 position-relative mt-3">
+            <input type="text" id="searchInput" class="form-control pe-5" placeholder="ค้นหาลูกค้า" onkeyup="filterCustomers()">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" class="bi bi-search position-absolute" style="right: 10px; top: 50%; transform: translateY(-50%);" viewBox="0 0 16 16">
+                <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+            </svg>
         </div>
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>ID ลูกค้า</th>
+                    <th>ชื่อ</th>
+                    <th>นามสกุล</th>
+                    <th>ที่อยู่</th>
+                    <th>เบอร์โทร</th>
+                    <th>ข้อมูลจำนำ</th>
+                </tr>
+            </thead>
+            <tbody id="customerTableBody">
+                <% if (customers.length === 0) { %>
+                    <tr>
+                        <td colspan="6" class="text-center">ไม่มีข้อมูลลูกค้า</td>
+                    </tr>
+                <% } else { %>
+                    <% customers.forEach(customer => { %>
+                        <tr>
+                            <td>
+                                <a href="/customer/<%= customer.customerId %>"><%= customer.customerId %></a>
+                            </td>
+                            <td>
+                                <%= customer.customerFName %>
+                            </td>
+                            <td>
+                                <%= customer.customerLName %>
+                            </td>
+                            <td>
+                                <%= customer.customerAddress %>
+                            </td>
+                            <td>
+                                <%= customer.customerPhone %>
+                            </td>
+                            <td>
+                                <% if (customer.pawnId && customer.pawnId.length > 0) { %>
+                                    <% customer.pawnId.forEach(pawn => { %>
+                                        <a href="/pawn/<%= pawn %>">
+                                            <%= pawn %>
+                                        </a><br>
+                                    <% }); %>
+                                <% } else { %>
+                                    <span>ไม่มีข้อมูลจำนำ</span>
+                                <% } %>
+                            </td>
+                        </tr>
+                    <% }); %>
+                <% } %>
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        function filterCustomers() {
+            const searchInput = document.getElementById('searchInput').value.toLowerCase();
+            const customerRows = document.querySelectorAll('#customerTableBody tr');
+
+            customerRows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                let isMatch = false;
+
+                cells.forEach(cell => {
+                    if (cell.textContent.toLowerCase().includes(searchInput)) {
+                        isMatch = true;
+                    }
+                });
+
+                row.style.display = isMatch ? '' : 'none';
+            });
+        }
+    </script>
 </body>
 
 </html>

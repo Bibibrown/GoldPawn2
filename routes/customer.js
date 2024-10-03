@@ -30,17 +30,6 @@ function validateCustomerData(req, res, next) {
     next();
 }
 
-// GET หน้ารายชื่อลูกค้า
-router.get('/customer-list', async (req, res) => {
-    try {
-        const customers = await Customer.find(); // ดึงข้อมูลลูกค้าทั้งหมด
-        res.render('customerlist', { customers }); // ส่งข้อมูลไปยัง view
-    } catch (error) {
-        console.error('Error fetching customers:', error);
-        res.status(500).send('Internal Server Error');
-    }
-});
-
 // GET หน้าเพิ่มลูกค้าใหม่
 router.get('/add-customer', (req, res) => {
     const customerID = req.query.customerID || ''; // รับ customerID จาก query parameter

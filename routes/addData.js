@@ -2,9 +2,15 @@ const express = require('express');
 const router = express.Router();
 const Type = require('../models/type');
 
-// GET หน้าเพิ่มข้อมูล
-router.get('/', (req, res) => {
-    res.render('adddata');
+// Route สำหรับแสดงหน้า adddata
+router.get('/', async (req, res) => {
+    try {
+        const types = await Type.find(); // ดึงข้อมูลประเภททองทั้งหมดจากฐานข้อมูล
+        res.render('adddata', { types: types }); // ส่งตัวแปร types ไปยัง template
+    } catch (error) {
+        console.error('Error fetching gold types:', error);
+        res.status(500).send('Server error');
+    }
 });
 
 // ฟังก์ชันสำหรับสร้าง typeId อัตโนมัติ
