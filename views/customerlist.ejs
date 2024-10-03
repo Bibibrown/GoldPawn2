@@ -23,14 +23,15 @@
 <body>
     <%- include('./partials/nav.ejs') %>
 
-        <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
-            <ol class="breadcrumb m-3">
-                <li class="breadcrumb-item"><a href="/">หน้าหลัก</a></li>
-                <li class="breadcrumb-item active" aria-current="page">รายชื่อลูกค้า</li>
-            </ol>
-        </nav>
+    <nav class="breadcrumb-nav fixed-top bg-light" style="--bs-breadcrumb-divider: '>'; margin-top: 56px;" aria-label="breadcrumb">
+        <ol class="breadcrumb m-2">
+            <li class="breadcrumb-item"><a href="/">หน้าหลัก</a></li>
+            <li class="breadcrumb-item active" aria-current="page">รายชื่อลูกค้า</li>
+        </ol>
+    </nav>
 
-        <div class="container mt-4">
+        <div class="container" style="margin-top: 7.7%;">
+            <h2>รายชื่อลูกค้า</h2>
             <table class="table table-bordered">
                 <thead>
                     <tr>
@@ -51,7 +52,7 @@
                             <% customers.forEach(customer=> { %>
                                 <tr>
                                     <td>
-                                        <%= customer.customerId %>
+                                        <a href="/customer/<%= customer.customerId %>"><%= customer.customerId %></a>
                                     </td>
                                     <td>
                                         <%= customer.customerFName %>

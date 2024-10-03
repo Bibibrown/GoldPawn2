@@ -34,7 +34,5 @@ pawnSchema.pre('save', async function (next) {
     next(); // ดำเนินการต่อเพื่อบันทึก
   });
 
-
-
 const Pawn = mongoose.model('Pawn', pawnSchema);
 module.exports = Pawn;
