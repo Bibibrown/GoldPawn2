@@ -1,0 +1,48 @@
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
+
+const paymentSchema = new Schema({
+    paymentId: {
+        type: String,
+        required: true,
+        unique: true
+    },
+    goldId: {
+        type: [String], // ฟิลด์ pid เป็น array ของ String
+        required: false // สามารถกำหนดให้เป็น optional หรือ required ได้
+    },
+    paymentDate: {
+        type: Date,
+        default: Date.now // วันที่จ่ายจะเป็นวันที่ปัจจุบัน
+    },
+    startDate: {
+        type: Date,
+        required: true
+    },
+    endDate: {
+        type: Date,
+        
+    },
+    nextDueDate: {
+        type: Date,
+        required: true
+    },
+    amount: {
+        type: Number,
+        required: true
+    },
+    statusPawn: {
+        type: String,
+        default:'เริ่มจำนำ',
+        enum: ['เริ่มจำนำ', 'ต่อดอก', 'ไถ่คืน'], // กำหนดสถานะที่อนุญาต
+    },
+    goldId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Gold',
+        required: true
+    }
+},{ timestamps: true } );
+
+const Payment = mongoose.model('Payment', paymentSchema);
+
+module.exports = Payment;

@@ -1,0 +1,271 @@
+<!-- views/addpawn.ejs -->
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ข้อมูลจำนำทอง</title>
+    <link rel='stylesheet' href="/bootstrap/css/bootstrap.min.css" />
+    <script src="/bootstrap/js/bootstrap.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *{
+            font-family: "Mitr", sans-serif;
+            font-weight: 400;
+            font-style: normal;
+        }
+        .vertical-divider {
+            border-left: 3px solid lightgray;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+    <%- include('./partials/nav.ejs') %>
+
+    <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+        <ol class="breadcrumb m-3">
+            <li class="breadcrumb-item"><a href="/">หน้าหลัก</a></li>
+            <li class="breadcrumb-item"><a href="/customer/<%= customer.customerId %>">ข้อมูลลูกค้า</a></li>
+            <li class="breadcrumb-item active" aria-current="page">ข้อมูลจำนำทอง</li>
+        </ol>
+    </nav>
+
+    <div class="container mt-4">
+        <div class="row">
+            <!-- ส่วนสำหรับฟอร์มกรอกข้อมูลจำนำทอง -->
+            <div class="col-md-5">
+                <h2>เพิ่มข้อมูลจำนำทอง</h2>
+                <form id="goldPawnForm">
+                    <h4 class="mb-3">รายละเอียดลูกค้า</h4>
+                    <div class="mb-3 row">
+                        <label for="customerId" class="col-sm-2 col-form-label">ID ลูกค้า</label>
+                        <div class="col-sm">
+                            <input type="text" class="form-control" id="customerId" value="<%= customer.customerId %>" readonly>
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <label for="customerFName" class="col-sm-2 col-form-label">ชื่อ</label>
+                        <div class="col-sm-4">
+                            <input type="text" class="form-control" id="customerFName" value="<%= customer.customerFName %>" readonly>
+                        </div>
+                        <label for="customerLName" class="col-sm-2 col-form-label">นามสกุล</label>
+                        <div class="col-sm-4">
+                            <input type="text" class="form-control" id="customerLName" value="<%= customer.customerLName %>" readonly>
+                        </div>
+                    </div>
+                    <h4 class="mb-3">รายละเอียดทอง</h4>
+                    <div class="mb-3 row">
+                        <label for="goldId" class="col-sm-2 col-form-label">ID ทอง</label>
+                        <div class="col-sm">
+                            <input type="text" class="form-control" id="goldId" value="<%= newGoldId %>" readonly>
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <label for="goldType" class="col-sm-2 col-form-label">ประเภท</label>
+                        <div class="col-sm-4">
+                            <select class="form-select" id="goldType" required>
+                                <option value="">เลือกประเภท</option>
+                                <option value="กำไล">กำไล</option>
+                                <option value="จี้">จี้</option>
+                                <option value="ต่างหู">ต่างหู</option>
+                                <option value="สร้อยข้อเท้า">สร้อยข้อเท้า</option>
+                                <option value="สร้อยข้อมือ">สร้อยข้อมือ</option>
+                                <option value="สร้อยคอ">สร้อยคอ</option>
+                                <option value="แหวน">แหวน</option>
+                            </select>
+                        </div>        
+                        <label for="weight" class="col-sm-2 col-form-label">น้ำหนัก</label>
+                        <div class="col-sm-4">
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="weight" name="weight" step="0.01" min="0.01" required>
+                                <span class="input-group-text">กรัม</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <label for="principal" class="col-sm-2 col-form-label">เงินต้น</label>
+                        <div class="col-sm">
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="principal" min="0" oninput="calculateTotal()" required>
+                                <span class="input-group-text">บาท</span>
+                            </div>
+                        </div>
+                        <label for="interest" class="col-sm-2 col-form-label">ดอกเบี้ย</label>
+                        <div class="col-sm">
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="interest" oninput="calculateTotal()" required>
+                                <span class="input-group-text">%</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <label for="total" class="col-sm-2 col-form-label">ดอกเบี้ยต่อเดือน</label>
+                        <div class="col-sm">
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="total" readonly>
+                                <span class="input-group-text">บาท</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-end">
+                        <button type="reset" class="btn btn-secondary me-2">ล้าง</button>
+                        <button type="submit" class="btn btn-success">ยืนยัน</button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- เส้นคั่นกลางแนวตั้ง -->
+            <div class="col-md-1 d-flex align-items-center justify-content-center">
+                <div class="vertical-divider"></div>
+            </div>
+
+            <!-- ส่วนสำหรับแสดงตารางประวัติการจำนำ -->
+            <div class="col-md-6">
+                <h2>ประวัติทองที่จำนำ</h2>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>ID ทอง</th>
+                            <th>ประเภท</th>
+                            <th>น้ำหนัก</th>
+                            <th>เงินต้น</th>
+                            <th>ดอกเบี้ยต่อเดือน</th>
+                            <th>สถานะ</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pawnHistoryTable">
+                        <% pawns.forEach(function(pawn) { %>
+                            <tr>
+                                <td>
+                                    <a href="/pawn/gold-payment-history/<%= pawn.goldId %>"><%= pawn.goldId %></a>
+                                </td>
+                                <td><%= pawn.type %></td>
+                                <td><%= pawn.weight %></td>
+                                <td><%= pawn.principal %></td>
+                                <td><%= pawn.total %></td>
+                                <td><%= pawn.status %></td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <footer class="mt-5"></footer>
+
+    <script>
+        // คำนวณดอกเบี้ยตามเปอร์เซ็นต์ที่กรอก
+        function calculateTotal() {
+            const principal = parseFloat(document.getElementById('principal').value) || 0; // เงินต้น
+            const principalPercent = parseFloat(document.getElementById('interest').value) || 0; // ดอกเบี้ย
+
+            if (principal < 0 || principalPercent < 0) {
+                alert("เงินต้นและดอกเบี้ยต้องไม่เป็นค่าลบ");
+                return;
+            }
+
+            const interest = (principal * (principalPercent / 100)).toFixed(2); // คำนวณดอกเบี้ย
+            document.getElementById('total').value = interest; // แสดงผลในช่อง interest
+        }
+
+        // ฟังก์ชันเพิ่มข้อมูลจำนำทองไปยังตาราง
+        function addPawnToTable(pawn) {
+            const tableBody = document.getElementById('pawnHistoryTable');
+            const row = document.createElement('tr');
+
+            row.innerHTML = `
+                <td><a href="/pawn/gold-payment-history/${pawn.goldId}">${pawn.goldId}</a></td>
+                <td>${pawn.type}</td>
+                <td>${pawn.weight}</td>
+                <td>${pawn.principal}</td>
+                <td>${pawn.total}</td>
+                <td>${pawn.status}</td>
+
+            `;
+
+            tableBody.appendChild(row);
+        }
+
+        // จัดการการส่งฟอร์มจำนำทอง
+        document.getElementById('goldPawnForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // ป้องกันการรีเฟรชหน้า
+
+            const goldData = {
+                customerId: document.getElementById('customerId').value,
+                goldId: document.getElementById('goldId').value,
+                type: document.getElementById('goldType').value,
+                weight: parseFloat(document.getElementById('weight').value),
+                principal: parseFloat(document.getElementById('principal').value),
+                interest: parseFloat(document.getElementById('interest').value),
+                total: parseFloat(document.getElementById('total').value)
+            };
+
+            // ตรวจสอบว่าทุกฟิลด์มีค่า
+            if (!goldData.customerId || !goldData.goldId || !goldData.type || isNaN(goldData.weight) || isNaN(goldData.principal) || isNaN(goldData.interest) || isNaN(goldData.total)) {
+                alert('กรุณากรอกข้อมูลให้ครบถ้วน');
+                return;
+            }
+
+            // ส่งคำขอเพิ่มข้อมูลจำนำทองไปยังเซิร์ฟเวอร์
+            fetch('/pawn', { // ปรับเส้นทางเป็น '/pawn' ตาม router
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(goldData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(data => { throw new Error(data.message || 'ไม่สามารถเพิ่มข้อมูลจำนำทองได้'); });
+                }
+                return response.json();
+            })
+            .then(data => {
+                alert('เพิ่มข้อมูลจำนำทองเรียบร้อย');
+                // รีเซ็ตฟอร์ม
+                document.getElementById('goldPawnForm').reset();
+                // รีคำนวณเงินสุทธิ
+                document.getElementById('total').value = '';
+                // เพิ่มข้อมูลในตารางประวัติการจำนำ
+                // addPawnToTable(goldData);
+                fetchPawnHistory();
+
+            })
+            .catch(err => {
+                alert(err.message);
+            });
+        });
+
+        // ฟังก์ชันเพื่อดึงและแสดงข้อมูลประวัติการจำนำทอง (ถ้ามี)
+        function fetchPawnHistory() {
+            const customerId = document.getElementById('customerId').value;
+            fetch(`/pawn/${encodeURIComponent(customerId)}`)
+                .then(response => {
+                    if (!response.ok) throw new Error('ไม่สามารถดึงข้อมูลประวัติการจำนำทองได้');
+                    return response.json();
+                })
+                .then(data => {
+                    const tableBody = document.getElementById('pawnHistoryTable');
+                    tableBody.innerHTML = ''; // ล้างข้อมูลตารางเดิม
+                    data.forEach(pawn => {
+                        addPawnToTable(pawn); // เพิ่มข้อมูลใหม่ที่ดึงมาเข้าตาราง
+                    // data.forEach(pawn => {
+                    //     addPawnToTable(pawn);
+                    });
+                })
+                .catch(err => {
+                    console.error(err.message);
+                });
+        }
+
+        // เมื่อหน้าโหลดเสร็จ
+        window.addEventListener('DOMContentLoaded', (event) => {
+            // ดึงประวัติการจำนำทอง
+            // fetchPawnHistory();
+        });
+    </script>
+</body>
+</html>
