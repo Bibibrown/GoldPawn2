@@ -199,7 +199,10 @@
     });
 
     document.getElementById('clearButton2').addEventListener('click', function () {
-        document.getElementById('goldTypeForm').reset();
+        // ล้างฟิลด์ชื่อประเภททอง
+        document.getElementById('typeName').value = '';
+        fetchLatestTypeId(); // ดึง typeId ล่าสุด
+        loadGoldTypes(); // โหลดข้อมูลประเภททอง
     });
 
     // ฟังก์ชันสำหรับดึง typeId ล่าสุด
