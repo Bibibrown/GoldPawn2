@@ -10,9 +10,17 @@ router.get('/', (req, res) => {
 
 // GET หน้ารายชื่อลูกค้า
 router.get('/customer-list', async (req, res) => {
+    const searchQuery = req.query.search || ''; // รับคำค้นจาก query parameters
     try {
-        const customers = await Customer.find(); // ดึงข้อมูลลูกค้าทั้งหมด
-        res.render('customerlist', { customers }); // ส่งข้อมูลไปยัง view
+        const customers = await Customer.find({
+            $or: [
+                { customerFName: new RegExp(searchQuery, 'i') },
+                { customerLName: new RegExp(searchQuery, 'i') },
+                { customerAddress: new RegExp(searchQuery, 'i') },
+                { customerPhone: new RegExp(searchQuery, 'i') }
+            ]
+        });
+        res.render('customerlist', { customers }); // ส่งข้อมูลลูกค้าไปยัง view
     } catch (error) {
         console.error('Error fetching customers:', error);
         res.status(500).send('Internal Server Error');
@@ -21,9 +29,26 @@ router.get('/customer-list', async (req, res) => {
 
 // GET หน้าข้อมูลทอง
 router.get('/gold-list', async (req, res) => {
+    const searchQuery = req.query.search || ''; // รับคำค้นจาก query parameters
+    let searchCriteria = {
+        $or: [
+            { goldId: new RegExp(searchQuery, 'i') }, // ค้นหาจาก goldId
+            { status: new RegExp(searchQuery, 'i') }, // ค้นหาจาก status
+        ]
+    };
+
+    // ตรวจสอบว่าคำค้นเป็นตัวเลขหรือไม่
+    const numericSearch = Number(searchQuery);
+    if (!isNaN(numericSearch)) {
+        // ถ้าเป็นตัวเลข เพิ่มเงื่อนไขค้นหาสำหรับ weight
+        searchCriteria.$or.push({ weight: numericSearch });
+    }
+
     try {
-        const goldData = await GoldPawn.find().populate('typeName', 'typeName'); // ดึงข้อมูลทองทั้งหมด พร้อม populate typeName
-        res.render('goldlist', { goldData }); // ส่งข้อมูลทองไปยัง view
+        const goldData = await GoldPawn.find(searchCriteria).populate('typeName', 'typeName'); // populate typeName
+
+        // ส่งข้อมูลทองไปยัง view
+        res.render('goldlist', { goldData, noData: goldData.length === 0 });
     } catch (error) {
         console.error('Error fetching gold data:', error);
         res.status(500).send('Server error');
