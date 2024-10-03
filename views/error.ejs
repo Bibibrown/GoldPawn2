@@ -1,3 +1,35 @@
-<h1><%= message %></h1>
+<!-- <h1><%= message %></h1>
 <h2><%= error.status %></h2>
-<pre><%= error.stack %></pre>
+<pre><%= error.stack %></pre> -->
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <title>เกิดข้อผิดพลาด</title>
+    <link rel='stylesheet' href="/bootstrap/css/bootstrap.min.css" />
+    <style>
+        body {
+            font-family: "Mitr", sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f8f9fa;
+        }
+        .error-container {
+            text-align: center;
+            padding: 20px;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            background-color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <h1>เกิดข้อผิดพลาด</h1>
+        <p><%= message %></p>
+        <a href="/" class="btn btn-primary">กลับไปหน้าแรก</a>
+    </div>
+</body>
+</html>
