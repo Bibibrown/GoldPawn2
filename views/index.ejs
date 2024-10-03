@@ -1,28 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
+<html lang="th">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>เว็บไซต์จำนำทอง</title>
-    <link rel='stylesheet' href="/bootstrap/css/bootstrap.min.css" />
-    <script src="/bootstrap/js/bootstrap.min.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@200;300;400;500;600;700&display=swap"
-        rel="stylesheet">
-    <style>
-        * {
-            font-family: "Mitr", sans-serif;
-            font-weight: 400;
-            font-style: normal;
-        }
 
-        .container {
-            width: 50%;
+@@ -22,7 +23,60 @@
         }
     </style>
 </head>
+
 <body>
+    <%- include('./partials/nav.ejs') %>
     
+    <div class="container mt-5">
+        <!-- Search Form -->
+        <div class="mt-5">
+            <div class="input-group">
+                <input type="text" class="form-control" id="searchId" placeholder="ค้นหา ID ลูกค้า"
+                    aria-label="ค้นหา ID ลูกค้า">
+                <button class="btn btn-outline-secondary" type="button" id="searchButton">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" class="bi bi-search" viewBox="0 0 16 16">
+                        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+                      </svg>
+                </button>
+            </div>
+            <small id="searchHelp" class="form-text text-muted">กรุณากรอกเลขบัตรประชาชนลูกค้า 13 หลัก</small>
+        </div>
+    </div>
+
+    <footer class="mt-5"></footer>
+
+    <script>
+        document.getElementById('searchButton').addEventListener('click', function () {
+            const customerId = document.getElementById('searchId').value.trim();
+            if (customerId) {
+                if (customerId.length !== 13 || !/^\d+$/.test(customerId)) {  // ตรวจสอบว่ามีแค่ตัวเลข
+                    alert('ID ลูกค้าต้องเป็นตัวเลขและมีความยาว 13 หลัก');
+                    return;
+                }
+                fetch(`/customer/${customerId}`)
+                    .then(response => {
+                        if (response.ok) {
+                            // ถ้ามีข้อมูลลูกค้าอยู่ในระบบ เปลี่ยนเส้นทางไปยังหน้ารายละเอียดลูกค้า
+                            window.location.href = `/customer/${customerId}`;
+                        } else if (response.status === 404) {
+                            alert('ไม่พบข้อมูลลูกค้า')
+                            // ถ้าไม่มีข้อมูลลูกค้า เปลี่ยนเส้นทางไปยังหน้าเพิ่มข้อมูลลูกค้าใหม่
+                            window.location.href = `/customer/add-customer?customerID=${customerId}`;
+                        } else {
+                            // แสดงข้อผิดพลาดอื่นๆ
+                            return response.json().then(errorData => {
+                                throw new Error(errorData.message || 'เกิดข้อผิดพลาดในการค้นหาข้อมูลลูกค้า');
+                            });
+                        }
+                    })
+                    .catch(err => {
+                        alert(err.message);
+                    });
+            } else {
+                alert('กรุณากรอก ID ลูกค้า');
+            }
+        });
+    </script>
 </body>
+
 </html>

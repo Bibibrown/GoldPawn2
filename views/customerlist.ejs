@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>รายชื่อลูกค้า</title>
+    <link rel='stylesheet' href="/bootstrap/css/bootstrap.min.css" />
+    <script src="/bootstrap/js/bootstrap.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@200;300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            font-family: "Mitr", sans-serif;
+            font-weight: 400;
+            font-style: normal;
+        }
+    </style>
+</head>
+<body>
+    <%- include('./partials/nav.ejs') %>
+
+    <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+        <ol class="breadcrumb m-3">
+            <li class="breadcrumb-item"><a href="/">หน้าหลัก</a></li>
+            <li class="breadcrumb-item active" aria-current="page">รายชื่อลูกค้า</a></li>
+        </ol>
+    </nav>
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>ID ลูกค้า</th>
+                <th>ชื่อ</th>
+                <th>นามสกุล</th>
+                <th>ที่อยู่</th>
+                <th>เบอร์โทร</th>
+                <th>ข้อมูลจำนำ</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% if (customer.length === 0) { %>
+                <tr>
+                    <td colspan="6" class="text-center">ไม่มีข้อมูลลูกค้า</td>
+                </tr>
+            <% } else { %>
+                <% customers.forEach(customer => { %>
+                    <tr>
+                        <td>
+                            <a href="/customer/<%= customer.customerId %>"><%= customer.customerId %></a>
+                        </td>
+                        <td><%= customer.customerFName %></td>
+                        <td><%= customer.customerLName %></td>
+                        <td><%= customer.customerAddress %></td>
+                        <td><%= customer.customerPhone %></td>
+                        <td>
+                            <a href="" class="btn btn-info">ดู</a>
+                        </td>
+                    </tr>
+                <% }); %>
+            <% } %>
+        </tbody>
+    </table>
+</body>
+</html>

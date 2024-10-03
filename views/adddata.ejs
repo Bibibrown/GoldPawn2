@@ -1,0 +1,33 @@
+return;
+}
+
+const newCustomerData = {
+    customerId: document.getElementById('customerId').value,
+    customerFName: document.getElementById('customerFName').value,
+    customerLName: document.getElementById('customerLName').value,
+    customerAddress: document.getElementById('customerAddress').value,
+    customerPhone: document.getElementById('customerPhone').value
+};
+
+// ส่งข้อมูลลูกค้าใหม่ไปยังเซิร์ฟเวอร์
+fetch('/customer', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(newCustomerData)
+})
+    .then(response => {
+        if (!response.ok) throw new Error('เกิดข้อผิดพลาดในการเพิ่มข้อมูลลูกค้า');
+        alert('เพิ่มข้อมูลลูกค้าเรียบร้อย');
+
+        // นำไปยังหน้าข้อมูลลูกค้าใหม่
+        window.location.href = `/customer/${newCustomerData.customerId}`;
+    })
+    .catch(err => {
+        alert(err.message);
+    });
+});
+</script>
+
+</html>
