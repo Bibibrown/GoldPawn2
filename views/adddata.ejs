@@ -22,6 +22,13 @@
             border-left: 3px solid lightgray;
             height: 100%;
         }
+
+        .table-wrapper {
+            max-height: 300px;
+            /* กำหนดความสูงสูงสุดของตาราง */
+            overflow-y: auto;
+            /* เปิดใช้งานการเลื่อนในแนวตั้ง */
+        }
     </style>
 </head>
 
@@ -106,22 +113,24 @@
                     </form>
 
                     <h2 class="mt-4">ประเภททองทั้งหมด: <%= types.length %> ประเภท</h2>
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>ID ประเภท</th>
-                                <th>ชื่อประเภททอง</th>
-                            </tr>
-                        </thead>
-                        <tbody id="goldTypeTableBody">
-                            <!-- ข้อมูลประเภททองจะถูกเพิ่มที่นี่ -->
-                        </tbody>
-                    </table>
+                    <div class="table-wrapper">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>ID ประเภท</th>
+                                    <th>ชื่อประเภททอง</th>
+                                </tr>
+                            </thead>
+                            <tbody id="goldTypeTableBody">
+                                <!-- ข้อมูลประเภททองจะถูกเพิ่มที่นี่ -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <footer class="mt-5"></footer>
+        <!-- <footer class="mt-5"></footer> -->
 </body>
 
 <script>
@@ -233,7 +242,7 @@
                 `;
                 tableBody.appendChild(row);
             });
-            
+
         } catch (error) {
             console.error('Error loading gold types:', error);
         }
