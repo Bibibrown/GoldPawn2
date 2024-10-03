@@ -149,10 +149,9 @@
             },
             body: JSON.stringify(newCustomerData)
         })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Success:', data);
-                alert('เพิ่มข้อมูลลูกค้าเรียบร้อย'); // แสดงข้อความแจ้งเตือน
+            .then(response => {
+                if (!response.ok) throw new Error('เกิดข้อผิดพลาดในการเพิ่มข้อมูลลูกค้า');
+                alert('เพิ่มข้อมูลลูกค้าเรียบร้อย');
                 // ล้างฟอร์ม
                 customerForm.reset();
             })
