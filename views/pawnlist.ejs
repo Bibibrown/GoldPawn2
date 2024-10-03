@@ -1,0 +1,57 @@
+<<<<<<< Updated upstream
+=======
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ข้อมูลการจำนำ</title>
+    <link rel='stylesheet' href="/bootstrap/css/bootstrap.min.css" />
+    <script src="/bootstrap/js/bootstrap.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@200;300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            font-family: "Mitr", sans-serif;
+            font-weight: 400;
+            font-style: normal;
+        }
+    </style>
+</head>
+<body>
+    <%- include('./partials/nav.ejs') %>
+
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>ID จำนำ</th>
+                <th>วันที่จำนำ</th>
+                <th>ทองที่จำนำ</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% if (customer.length === 0) { %>
+                <tr>
+                    <td colspan="6" class="text-center">ไม่มีข้อมูลการจำนำ</td>
+                </tr>
+            <% } else { %>
+                <% pawns.forEach(pawn => { %>
+                    <tr>
+                        <td><%= pawn.pawnId %></td>
+                        <td><%= pawn.pawnDate %></td>
+                        <td>
+                            <!-- แสดงรายชื่อทองที่จำนำ กดเพื่อดูรายละเอียดทองแต่ละ ID -->
+                            <% pawns.forEach(pawn => { %>
+                                <a href=""><%= pawn.goldId %></a>
+                            <% }); %>
+                        </td>
+                    </tr>
+                <% }); %>
+            <% } %>
+        </tbody>
+    </table>
+</body>
+</html>
+>>>>>>> Stashed changes
