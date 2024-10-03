@@ -42,9 +42,9 @@ const goldSchema = new Schema({
         default:'จำนำ',
         enum: ['จำนำ', 'หลุดจำนำ', 'ไถ่คืน'], // กำหนดสถานะที่อนุญาต
     },
-    goldId: {
-        type: [String], // ฟิลด์ pid เป็น array ของ String
-        required: false // สามารถกำหนดให้เป็น optional หรือ required ได้
+    paymentId: {
+        type: [String], 
+        required: false 
     }
 }, { timestamps: true });
 
