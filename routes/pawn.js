@@ -159,7 +159,7 @@ router.post('/addpawn/:customerId', async (req, res) => {
     }
 });
 
-// เพิ่ม route ใหม่สำหรับดูรายละเอียดการจำนำ
+// route สำหรับดูรายละเอียดการจำนำ
 router.get('/:pawnId', async (req, res) => {
     try {
         const { pawnId } = req.params;
@@ -179,7 +179,7 @@ router.get('/:pawnId', async (req, res) => {
         }
 
         // ค้นหาข้อมูลทองที่เกี่ยวข้องกับการจำนำนี้
-        const golds = await Pawn.find({ pawnId: pawn._id }).populate('typeName');
+        const golds = await Pawn.find({ goldId: { $in: pawn.goldId } }); // ใช้ goldId ที่อยู่ใน pawn
 
         // แปลงข้อมูล golds เพื่อใช้ goldId แทน _id
         const formattedGolds = golds.map(gold => ({
