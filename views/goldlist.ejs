@@ -9,12 +9,34 @@
     <script src="/bootstrap/js/bootstrap.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@200;300;400;500;600;700&display=swap"
+        rel="stylesheet">
     <style>
         * {
             font-family: "Mitr", sans-serif;
             font-weight: 400;
             font-style: normal;
+        }
+
+        .table-wrapper {
+            max-height: 450px;
+            /* กำหนดความสูงสูงสุดของตาราง */
+            overflow-y: auto;
+            /* เปิดใช้งานการเลื่อนในแนวตั้ง */
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            /* ให้ขอบตารางรวมกัน */
+        }
+
+        thead th {
+            position: sticky;
+            top: 0;
+            background-color: #fff;
+            /* กำหนดพื้นหลังสำหรับส่วนหัว */
+            z-index: 1;
         }
     </style>
 </head>
@@ -22,68 +44,82 @@
 <body>
     <%- include('./partials/nav.ejs') %>
 
-    <nav class="breadcrumb-nav fixed-top bg-light" style="--bs-breadcrumb-divider: '>'; margin-top: 59px;" aria-label="breadcrumb">
-        <ol class="breadcrumb m-2">
-            <li class="breadcrumb-item"><a href="/">หน้าหลัก</a></li>
-            <li class="breadcrumb-item active" aria-current="page">ข้อมูลทอง</li>
-        </ol>
-    </nav>
+        <nav class="breadcrumb-nav fixed-top bg-light" style="--bs-breadcrumb-divider: '>'; margin-top: 59px;"
+            aria-label="breadcrumb">
+            <ol class="breadcrumb m-2">
+                <li class="breadcrumb-item"><a href="/">หน้าหลัก</a></li>
+                <li class="breadcrumb-item active" aria-current="page">ข้อมูลทอง</li>
+            </ol>
+        </nav>
 
-    <div class="container" style="margin-top: 7.7%;">
-        <h2>ข้อมูลทองทั้งหมด: <%= goldData.length %> ชิ้น</h2>
-        <div class="mb-3 position-relative mt-3">
-            <input type="text" id="searchInput" class="form-control pe-5" placeholder="ค้นหาทอง" onkeyup="filterGold()">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" class="bi bi-search position-absolute" style="right: 10px; top: 50%; transform: translateY(-50%);" viewBox="0 0 16 16">
-                <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
-            </svg>
-        </div>
-        <table class="table table-bordered">
-            <thead>
-                <tr>
-                    <th>ID ทอง</th>
-                    <th>ประเภท</th>
-                    <th>น้ำหนัก (กรัม)</th>
-                    <th>สถานะ</th>
-                </tr>
-            </thead>
-            <tbody id="goldListTableBody">
-                <% if (noData) { %>
-                    <tr>
-                        <td colspan="4" class="text-center">ไม่มีข้อมูลทอง</td>
-                    </tr>
-                <% } else { %>
-                    <% goldData.forEach(gold => { %>
+        <div class="container" style="margin-top: 7.7%;">
+            <h2>ข้อมูลทองทั้งหมด: <%= goldData.length %> ชิ้น</h2>
+            <div class="mb-3 position-relative mt-3">
+                <input type="text" id="searchInput" class="form-control pe-5" placeholder="ค้นหาทอง"
+                    onkeyup="filterGold()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" class="bi bi-search position-absolute"
+                    style="right: 10px; top: 50%; transform: translateY(-50%);" viewBox="0 0 16 16">
+                    <path
+                        d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0" />
+                </svg>
+            </div>
+            <div class="table-wrapper">
+                <table class="table table-bordered">
+                    <thead>
                         <tr>
-                            <td><a href="/pawn/gold-payment-history/<%= gold.goldId %>"><%= gold.goldId %></a></td> <!-- กดเพื่อดูรายละเอียดธุรกรรมทอง -->
-                            <td><%= gold.typeName.typeName %></td> <!-- แสดงชื่อประเภททอง -->
-                            <td><%= gold.weight %></td>
-                            <td><%= gold.status %></td>
+                            <th>ID ทอง</th>
+                            <th>ประเภท</th>
+                            <th>น้ำหนัก (กรัม)</th>
+                            <th>สถานะ</th>
                         </tr>
-                    <% }); %>
-                <% } %>
-            </tbody>
-        </table>        
-    </div>
+                    </thead>
+                    <tbody id="goldListTableBody">
+                        <% if (noData) { %>
+                            <tr>
+                                <td colspan="4" class="text-center">ไม่มีข้อมูลทอง</td>
+                            </tr>
+                            <% } else { %>
+                                <% goldData.forEach(gold=> { %>
+                                    <tr>
+                                        <td><a href="/pawn/gold-payment-history/<%= gold.goldId %>">
+                                                <%= gold.goldId %>
+                                            </a></td> <!-- กดเพื่อดูรายละเอียดธุรกรรมทอง -->
+                                        <td>
+                                            <%= gold.typeName.typeName %>
+                                        </td> <!-- แสดงชื่อประเภททอง -->
+                                        <td>
+                                            <%= gold.weight %>
+                                        </td>
+                                        <td>
+                                            <%= gold.status %>
+                                        </td>
+                                    </tr>
+                                    <% }); %>
+                                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
 
-    <script>
-        function filterGold() {
-            const searchInput = document.getElementById('searchInput').value.toLowerCase();
-            const goldRows = document.querySelectorAll('#goldListTableBody tr');
+        <script>
+            function filterGold() {
+                const searchInput = document.getElementById('searchInput').value.toLowerCase();
+                const goldRows = document.querySelectorAll('#goldListTableBody tr');
 
-            goldRows.forEach(row => {
-                const cells = row.querySelectorAll('td');
-                let isMatch = false;
+                goldRows.forEach(row => {
+                    const cells = row.querySelectorAll('td');
+                    let isMatch = false;
 
-                cells.forEach(cell => {
-                    if (cell.textContent.toLowerCase().includes(searchInput)) {
-                        isMatch = true;
-                    }
+                    cells.forEach(cell => {
+                        if (cell.textContent.toLowerCase().includes(searchInput)) {
+                            isMatch = true;
+                        }
+                    });
+
+                    row.style.display = isMatch ? '' : 'none';
                 });
-
-                row.style.display = isMatch ? '' : 'none';
-            });
-        }
-    </script>
+            }
+        </script>
 </body>
 
 </html>
