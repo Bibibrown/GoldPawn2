@@ -156,7 +156,7 @@ router.get('/:pawnId', async (req, res) => {
             return res.status(404).render('error', { message: 'ไม่พบข้อมูลการจำนำ' });
         }
 
-        // ค้นหาข้อมูลลูกค้าจาก customerId
+        // ค้นหา Customer โดยใช้ customerId
         const customer = await Customer.findOne({ customerId: pawn.customerId });
 
         if (!customer) {
@@ -164,10 +164,19 @@ router.get('/:pawnId', async (req, res) => {
         }
 
         // ค้นหาข้อมูลทองที่เกี่ยวข้องกับการจำนำนี้
-        const golds = await Pawn.find({ goldId: { $in: pawn.goldId } }).populate('typeName');
+        const golds = await Pawn.find({ pawnId: pawn._id }).populate('typeName');
+
+        // แปลงข้อมูล golds เพื่อใช้ goldId แทน _id
+        const formattedGolds = golds.map(gold => ({
+            ...gold.toObject(),
+            id: gold.goldId  // เพิ่ม field id ที่มีค่าเท่ากับ goldId
+        }));
 
         // ส่งข้อมูลไปแสดงในหน้า EJS
-        res.render('pawnlist', { pawn, customer, golds });
+        res.render('pawnlist', { 
+            pawn: { ...pawn.toObject(), customer }, 
+            golds: formattedGolds
+        });
 
     } catch (error) {
         console.error('Error fetching pawn details:', error);
