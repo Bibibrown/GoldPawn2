@@ -63,7 +63,7 @@
                 <!-- ส่วนสำหรับฟอร์มกรอกข้อมูลจำนำทอง -->
                 <div class="col-md-5">
                     <h2>เพิ่มข้อมูลจำนำทอง</h2>
-                    <form id="goldPawnForm" action="/pawn/addpawn" method="POST">
+                    <form id="goldPawnForm" action="/pawn/addpawn/<%= customer.customerId %>" method="POST">
                         <h4 class="mb-3">รายละเอียดลูกค้า</h4>
                         <div class="mb-3 row">
                             <label for="customerId" class="col-sm-2 col-form-label">ID ลูกค้า</label>
@@ -86,6 +86,12 @@
                         </div>
                         <h4 class="mb-3">รายละเอียดทอง</h4>
                         <div class="mb-3 row">
+                            <label for="pawnId" class="col-sm-2 col-form-label">ID จำนำ</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control" id="pawnId" name="pawnId"
+                                    value="<%= newPID %>" readonly>
+                            </div>
+
                             <label for="goldId" class="col-sm-2 col-form-label">ID ทอง</label>
                             <div class="col-sm">
                                 <input type="text" class="form-control" id="goldId" name="goldId"
@@ -154,7 +160,7 @@
 
                 <!-- ส่วนสำหรับแสดงตารางประวัติการจำนำ -->
                 <div class="col-md-6">
-                    <h2>ทองที่จำนำ</h2>
+                    <h2>ทองที่จำนำ  <span style="font-size: 0.6em;"> ID : <%= newPID %></span></h2>                    
                     <div class="table-wrapper">
                         <table class="table table-bordered">
                             <thead>
@@ -217,7 +223,30 @@
                 document.getElementById('intperm').value = interest; // แสดงผลในช่อง intperm
             }
 
-            // ไม่จำเป็นต้องใช้ JavaScript สำหรับการส่งฟอร์ม เพราะใช้การส่งแบบธรรมดาแล้ว
+            document.getElementById('goldPawnForm').addEventListener('submit', function(event) {
+        event.preventDefault(); // ป้องกันการรีเฟรชหน้า
+        
+        // คุณสามารถนำข้อมูลจากฟอร์มไปทำอย่างอื่นได้ เช่น ส่งผ่าน AJAX
+        const formData = new FormData(this);
+
+        // แสดงข้อมูลที่เก็บใน formData
+        for (let [key, value] of formData.entries()) {
+            console.log(`${key}: ${value}`);
+        }
+        
+        // ตัวอย่างการส่งข้อมูลแบบ AJAX (ถ้าอยากส่งไปยังเซิร์ฟเวอร์)
+        fetch('/pawn/addpawn/${customerId}', {
+            method: 'POST',
+            body: formData
+        }).then(response => {
+            return response.json();
+        }).then(data => {
+            console.log(data); // แสดงผลหลังจากส่งข้อมูลสำเร็จ
+        }).catch(error => {
+            console.error('Error:', error);
+        });
+    });
+
         </script>
 </body>
 

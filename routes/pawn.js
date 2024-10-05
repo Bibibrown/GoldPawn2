@@ -36,23 +36,7 @@ router.get('/addpawn/:customerId', async (req, res) => {
             return `G-${String(newGoldId).padStart(4, '0')}`; // คืนค่า typeId ใหม่
         }
         const newGoldId = await generateGoldId();
-        // ส่งข้อมูลลูกค้า, ประวัติการจำนำทอง, และ customerId ไปยังหน้า addpawn.ejs
-        res.render('addpawn', { customer, pawns, customerId: customer.customerId, newGoldId, typeList});
-    } catch (error) {
-        console.error('Error fetching customer or pawn history:', error);
-        res.status(500).render('error', { message: 'เกิดข้อผิดพลาดในการดึงข้อมูล' });
-    }
-});
 
-// เส้นทางเพื่อจัดการการเพิ่มการจำนำทองใหม่ (POST)
-router.post('/addpawn', async (req, res) => {
-    const { customerId, goldId, goldTypeName, weight, principal, interest, intperm } = req.body;
-    try {
-        // หาลูกค้าตาม customerId
-        const customer = await Customer.findOne({ customerId: customerId });
-        if (!customer) {
-            return res.status(404).render('error', { message: 'ไม่พบลูกค้า' });
-        }
         async function generatePawnId() {
             const lastPawn = await addPawn.findOne().sort({ createdAt: -1 }); // หาข้อมูลล่าสุด
             if (!lastPawn) return 'P-0001'; // ถ้าไม่มีข้อมูลเลย
@@ -61,14 +45,38 @@ router.post('/addpawn', async (req, res) => {
             return `P-${String(newPawnId).padStart(4, '0')}`; // คืนค่า typeId ใหม่
         }
         const newPID = await generatePawnId();
+
+        // ส่งข้อมูลลูกค้า, ประวัติการจำนำทอง, และ customerId ไปยังหน้า addpawn.ejs
+        res.render('addpawn', { customer, pawns, customerId: customer.customerId, newGoldId, newPID, typeList});
+    } catch (error) {
+        console.error('Error fetching customer or pawn history:', error);
+        res.status(500).render('error', { message: 'เกิดข้อผิดพลาดในการดึงข้อมูล' });
+    }
+});
+
+
+
+// เส้นทางเพื่อจัดการการเพิ่มการจำนำทองใหม่ (POST)
+router.post('/addpawn/:customerId', async (req, res) => {
+    console.log(req.body);
+    const { customerId, goldId, goldTypeName,pawnId, weight, principal, interest, intperm } = req.body;
+    try {
+
+        // หาลูกค้าตาม customerId
+        const customer = await Customer.findOne({ customerId: customerId });
+        if (!customer) {
+            return res.status(404).render('error', { message: 'ไม่พบลูกค้า' });
+        }
+
         // สร้าง Pawn ใหม่
         const newPawn = new addPawn({
-            pawnId: newPID, // ตัวอย่างการสร้าง pawnId แบบไม่ซ้ำ
+            pawnId: pawnId, // ตัวอย่างการสร้าง pawnId แบบไม่ซ้ำ
             customerId: customer.customerId,
             goldId: [] // เริ่มต้นเป็น array ว่าง
         });
 
-        await newPawn.save();
+        // await newPawn.save();
+        // console.log('Pawn saved:', newPawn);
 
         // สร้าง Gold ใหม่ที่อ้างอิงถึง Pawn นี้
         const newGold = new Pawn({
@@ -84,6 +92,7 @@ router.post('/addpawn', async (req, res) => {
         });
 
         await newGold.save();
+        console.log('Gold saved:', newGold);
 
         // เพิ่ม goldId ลงใน Pawn
         newPawn.goldId.push(newGold.goldId);
@@ -106,50 +115,54 @@ router.post('/addpawn', async (req, res) => {
         console.log('Pawns:', JSON.stringify(pawns, null, 2));
 
         res.redirect(`/pawn/addpawn/${encodeURIComponent(customerId)}`);
+
+        res.json({ message: 'Pawn added successfully', data: newGold });
+
     } catch (error) {
         console.error('Error adding new pawn:', error);
         res.status(500).render('error', { message: 'เกิดข้อผิดพลาดในการเพิ่มข้อมูลจำนำทอง' });
     }
 });
 
-router.get('/:pawnId', async (req, res) => {
-    const { pawnId } = req.params;
-    try {
-        console.log('Searching for pawnId:', pawnId);
-        // ค้นหา Pawn โดยใช้ pawnId แทน _id
-        const pawn = await addPawn.findOne({ pawnId: pawnId });
+
+// router.get('/:pawnId', async (req, res) => {
+//     const { pawnId } = req.params;
+//     try {
+//         console.log('Searching for pawnId:', pawnId);
+//         // ค้นหา Pawn โดยใช้ pawnId แทน _id
+//         const pawn = await addPawn.findOne({ pawnId: pawnId });
         
-        if (!pawn) {
-            console.log('Pawn not found');
-            return res.status(404).render('error', { message: 'ไม่พบข้อมูลจำนำ' });
-        }
+//         if (!pawn) {
+//             console.log('Pawn not found');
+//             return res.status(404).render('error', { message: 'ไม่พบข้อมูลจำนำ' });
+//         }
 
-        console.log('Pawn found:', JSON.stringify(pawn, null, 2));
+//         console.log('Pawn found:', JSON.stringify(pawn, null, 2));
 
-        // ค้นหา Customer โดยใช้ customerId แทน _id
-        const customer = await Customer.findOne({ customerId: pawn.customerId });
+//         // ค้นหา Customer โดยใช้ customerId แทน _id
+//         const customer = await Customer.findOne({ customerId: pawn.customerId });
 
-        if (!customer) {
-            console.log('Customer not found');
-            return res.status(404).render('error', { message: 'ไม่พบข้อมูลลูกค้า' });
-        }
+//         if (!customer) {
+//             console.log('Customer not found');
+//             return res.status(404).render('error', { message: 'ไม่พบข้อมูลลูกค้า' });
+//         }
 
-        // ค้นหาข้อมูล Gold
-        const goldItems = await Pawn.find({ goldId: { $in: pawn.goldId } }).populate('typeName');
-        console.log('Gold items found:', JSON.stringify(goldItems, null, 2));
+//         // ค้นหาข้อมูล Gold
+//         const goldItems = await Pawn.find({ goldId: { $in: pawn.goldId } }).populate('typeName');
+//         console.log('Gold items found:', JSON.stringify(goldItems, null, 2));
 
-        const pawnWithGold = {
-            ...pawn.toObject(),
-            goldItems: goldItems,
-            customer: customer // เพิ่มข้อมูลลูกค้าเข้าไปใน object
-        };
+//         const pawnWithGold = {
+//             ...pawn.toObject(),
+//             goldItems: goldItems,
+//             customer: customer // เพิ่มข้อมูลลูกค้าเข้าไปใน object
+//         };
 
-        res.render('pawnlist', { pawn: pawnWithGold });
-    } catch (error) {
-        console.error('Detailed error:', error);
-        res.status(500).render('error', { message: 'เกิดข้อผิดพลาดในการดึงข้อมูลจำนำ: ' + error.message });
-    }
-});
+//         res.render('pawnlist', { pawn: pawnWithGold });
+//     } catch (error) {
+//         console.error('Detailed error:', error);
+//         res.status(500).render('error', { message: 'เกิดข้อผิดพลาดในการดึงข้อมูลจำนำ: ' + error.message });
+//     }
+// });
 
 // router.get('/by-gold/:goldId', async (req, res) => {
 //     const { goldId } = req.params;
