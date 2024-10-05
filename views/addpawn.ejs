@@ -11,6 +11,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@200;300;400;500;600;700&display=swap"
         rel="stylesheet">
+    <script src="/js/pawn-functions.js"></script>
     <style>
         * {
             font-family: "Mitr", sans-serif;
@@ -178,7 +179,7 @@
                                     <% pawn.goldId.forEach(function(gold) { %>
                                         <tr>
                                             <td>
-                                                <a href="/pawn/gold-payment-history/<%= gold.goldId %>">
+                                                <a href="/payment/gold-payment-history/<%= gold.goldId %>">
                                                     <%= gold.goldId %>
                                                 </a>
                                             </td>
@@ -209,6 +210,7 @@
         <footer class="mt-5"></footer>
 
         <script>
+<<<<<<< HEAD
             // คำนวณดอกเบี้ยตามเปอร์เซ็นต์ที่กรอก
             function calculateTotal() {
                 const principal = parseFloat(document.getElementById('principal').value) || 0; // เงินต้น
@@ -291,6 +293,11 @@
             });
 
             
+=======
+            document.getElementById('goldPawnForm').addEventListener('submit', submitPawnForm);
+            document.getElementById('principal').addEventListener('input', calculateTotal);
+            document.getElementById('interest').addEventListener('input', calculateTotal);
+>>>>>>> 123b4058bd3c43a46f1368d7c6ea9d5485467be7
         </script>
 </body>
 
