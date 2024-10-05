@@ -263,44 +263,6 @@
             }
         });
 
-
-
-        // // ดักฟังเหตุการณ์เมื่อโมดัล "ต่อดอก" เปิด
-        // document.getElementById('extendPaymentModal').addEventListener('show.bs.modal', async function(event) {
-        //     const button = event.relatedTarget; // รับปุ่มที่กด
-        //     const paymentId = button.getAttribute('data-payment-id'); // ดึง paymentId
-
-        //     // ดึงข้อมูลการชำระเงิน
-        //     const payment = await fetchPaymentDetails(paymentId);
-        //     console.log('Payment details:', payment); // เพิ่มบรรทัดนี้เพื่อตรวจสอบข้อมูล
-        //     // ตรวจสอบก่อนว่าข้อมูลเป็นอาร์เรย์และไม่ว่าง
-        //     if (payment && Array.isArray(payment) && payment.length > 0) {
-        //         const paymentData = payment[0]; // ดึงออบเจ็กต์ตัวแรกจากอาร์เรย์
-
-        //         document.getElementById('startDate').value = paymentData.startDate ? new Date(paymentData.startDate).toISOString().split('T')[0] : '';
-        //         document.getElementById('endDate').value = paymentData.endDate ? new Date(paymentData.endDate).toISOString().split('T')[0] : '';
-        //         document.getElementById('nextDueDate').value = paymentData.nextDueDate ? new Date(paymentData.nextDueDate).toISOString().split('T')[0] : '';
-        //         document.getElementById('amount').value = paymentData.amount;
-        //     } else {
-        //         console.error('ไม่มีข้อมูลการชำระเงินที่ถูกต้อง');
-        //     }
-
-        // });
-        // document.getElementById('confirmExtend').addEventListener('click', async function() {
-        //     const paymentId = document.getElementById('extendPaymentModal').getAttribute('data-payment-id');
-
-        //     try {
-        //         const payment = await extendPayment(paymentId); // เรียกฟังก์ชัน extendPayment เพื่ออัปเดตข้อมูล
-        //         alert('การต่อดอกเสร็จสิ้น');
-        //         // ปิด Modal หลังจากการยืนยัน
-        //         const modal = bootstrap.Modal.getInstance(document.getElementById('extendPaymentModal'));
-        //         modal.hide();
-        //     } catch (error) {
-        //         console.error('Error confirming extend:', error);
-        //         alert('เกิดข้อผิดพลาดในการต่อดอก');
-        //     }
-        // });
-
     </script>
 </body>
 </html>

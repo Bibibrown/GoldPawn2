@@ -8,17 +8,23 @@ router.get('/', async (req, res) => {
 });
 
 router.get('/gold-payment-history/:goldId', async (req, res) => {
+    console.log('Accessing gold-payment-history route');
+    console.log('GoldId:', req.params.goldId);
     try {
         const { goldId } = req.params;
         
-        // ดึงข้อมูลทอง
+        // ดึงข้อมูลทองโดยใช้ goldId แทน _id
         const gold = await Pawn.findOne({ goldId }).populate('typeName');
         if (!gold) {
+            console.log('Gold not found');
             return res.status(404).render('error', { message: 'ไม่พบข้อมูลทอง' });
         }
 
-        // ดึงประวัติการชำระเงิน
+        console.log('Gold found:', gold);
+
+        // ดึงประวัติการชำระเงินโดยใช้ goldId แทน _id
         const payments = await Payment.find({ goldId }).sort({ paymentDate: -1 });
+        console.log('Payments found:', payments);
 
         res.render('golddetail', { gold, payments });
     } catch (error) {

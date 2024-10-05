@@ -102,10 +102,12 @@ router.post('/addpawn/:customerId', async (req, res) => {
             });
         }
 
+        const type = await Type.findById(typeName);
+
         const newGold = new Pawn({
-            pawnId: existingPawn._id,
+            pawnId: newPawnId,
             goldId: newGoldId,
-            typeName: new mongoose.Types.ObjectId(typeName),
+            typeName: type.typeName,
             weight: weight,
             principal: principal,
             interest: interest,
@@ -117,7 +119,7 @@ router.post('/addpawn/:customerId', async (req, res) => {
         await newGold.save();
         console.log('Gold saved:', newGold);
 
-        existingPawn.goldId.push(newGold._id);
+        existingPawn.goldId.push(newGoldId);
         await existingPawn.save();
         console.log('Pawn saved:', existingPawn);
 
@@ -128,17 +130,17 @@ router.post('/addpawn/:customerId', async (req, res) => {
         }
 
         // ดึงข้อมูล Gold ที่มี typeName populated
-        const populatedGold = await Pawn.findById(newGold._id).populate('typeName');
+        // const populatedGold = await Pawn.findById(newGold._id).typeName;
 
         console.log(existingPawn)
-        console.log(populatedGold)
+        console.log(newGold)
         console.log(newPawnId)
         console.log(newGoldId)
 
         res.status(201).json({ 
             message: 'Gold added successfully', 
             pawn: existingPawn,
-            gold: populatedGold,
+            gold: newGold,
             newPawnId: newPawnId,
             newGoldId: newGoldId
         });

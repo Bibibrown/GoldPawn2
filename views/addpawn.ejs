@@ -11,6 +11,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@200;300;400;500;600;700&display=swap"
         rel="stylesheet">
+    <script src="/js/pawn-functions.js"></script>
     <style>
         * {
             font-family: "Mitr", sans-serif;
@@ -178,7 +179,7 @@
                                     <% pawn.goldId.forEach(function(gold) { %>
                                         <tr>
                                             <td>
-                                                <a href="/pawn/gold-payment-history/<%= gold.goldId %>">
+                                                <a href="/payment/gold-payment-history/<%= gold.goldId %>">
                                                     <%= gold.goldId %>
                                                 </a>
                                             </td>
@@ -209,6 +210,7 @@
         <footer class="mt-5"></footer>
 
         <script>
+<<<<<<< HEAD
             // คำนวณดอกเบี้ยตามเปอร์เซ็นต์ที่กรอก
             function calculateTotal() {
                 const principal = parseFloat(document.getElementById('principal').value) || 0; // เงินต้น
@@ -221,6 +223,28 @@
 
                 const interest = (principal * (interestPercent / 100)).toFixed(2); // คำนวณดอกเบี้ย
                 document.getElementById('intperm').value = interest; // แสดงผลในช่อง intperm
+            }
+
+                // เพิ่มฟังก์ชัน addNewRowToPawnHistoryTable
+            function addNewRowToPawnHistoryTable(gold) {
+                const table = document.getElementById('pawnHistoryTable');
+                const newRow = table.insertRow();
+                newRow.innerHTML = `
+                    <td><a href="/pawn/gold-payment-history/${gold.goldId}">${gold.goldId}</a></td>
+                    <td>${gold.typeName}</td>
+                    <td>${gold.weight} กรัม</td>
+                    <td>${gold.principal} บาท</td>
+                    <td>${gold.intperm} บาท</td>
+                    <td>${gold.status}</td>
+                `;
+            }
+
+            let currentGoldId = parseInt(document.getElementById('goldId').value.match(/\d+/)[0]);
+
+            function updateGoldId() {
+                currentGoldId++;
+                const formattedGoldId = currentGoldId.toString().padStart(4, '0');
+                document.getElementById('goldId').value = `G-${formattedGoldId}`;
             }
 
             document.getElementById('goldPawnForm').addEventListener('submit', function(event) {
@@ -245,6 +269,9 @@
                     console.log(data);
                     alert(data.message);
                     
+                    // เพิ่มข้อมูลใหม่ลงในตาราง
+                    addNewRowToPawnHistoryTable(data.gold);
+
                     // ล้างข้อมูลในฟอร์มยกเว้น customerId, customerFName, customerLName, และ pawnId
                     const customerId = this.customerId.value;
                     const customerFName = this.customerFName.value;
@@ -256,14 +283,8 @@
                     this.customerLName.value = customerLName;
                     this.pawnId.value = pawnId;
 
-                    const currentGoldId = parseInt(document.getElementById('goldId').value.match(/\d+/)[0]); 
-                    const newGoldId = currentGoldId + 1;
-                    
                     // อัปเดต goldId ใหม่
-                    const formattedGoldId = newGoldId.toString().padStart(4, '0');
-
-                    // อัปเดต goldId ใหม่
-                    document.getElementById('goldId').value = `G-${formattedGoldId}`;
+                    updateGoldId();
 
                 }).catch(error => {
                     console.error('Error:', error);
@@ -271,20 +292,12 @@
                 });
             });
 
-            function addNewRowToPawnHistoryTable(gold) {
-                const tableBody = document.getElementById('pawnHistoryTable');
-                const newRow = document.createElement('tr');
-                newRow.innerHTML = `
-                    <td><a href="/pawn/gold-payment-history/${gold.goldId}">${gold.goldId}</a></td>
-                    <td>${gold.typeName ? gold.typeName.typeName : 'N/A'}</td>
-                    <td>${gold.weight} กรัม</td>
-                    <td>${gold.principal} บาท</td>
-                    <td>${gold.intperm} บาท</td>
-                    <td>${gold.status}</td>
-                `;
-                tableBody.insertBefore(newRow, tableBody.firstChild);
-            }
             
+=======
+            document.getElementById('goldPawnForm').addEventListener('submit', submitPawnForm);
+            document.getElementById('principal').addEventListener('input', calculateTotal);
+            document.getElementById('interest').addEventListener('input', calculateTotal);
+>>>>>>> 123b4058bd3c43a46f1368d7c6ea9d5485467be7
         </script>
 </body>
 
