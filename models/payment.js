@@ -32,7 +32,7 @@ const paymentSchema = new Schema({
         enum: ['เริ่มจำนำ', 'ต่อดอก', 'ไถ่คืน'], // กำหนดสถานะที่อนุญาต
     },
     goldId: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: String,
         ref: 'Gold',
         required: true
     }
