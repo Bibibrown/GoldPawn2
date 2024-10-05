@@ -53,7 +53,7 @@
                 <td>
                     <% if (Array.isArray(pawn.goldItems)) { %>
                         <% pawn.goldItems.forEach(gold => { %>
-                            <%= gold.typeName %><br>
+                            <%= gold.typeName.typeName %><br>
                         <% }); %>
                     <% } else { %>
                         N/A
