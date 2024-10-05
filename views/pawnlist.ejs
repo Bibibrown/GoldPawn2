@@ -30,12 +30,7 @@
             <tr>
                 <th>Pawn ID</th>
                 <th>Gold ID</th>
-                <th>Type Name</th>
-                <th>Weight</th>
-                <th>Principal</th>
-                <th>Interest</th>
-                <th>Interest per Month</th>
-                <th>Status</th>
+                <th>วันที่จำนำ</th>
             </tr>
         </thead>
         <tbody>
@@ -50,60 +45,7 @@
                         N/A
                     <% } %>
                 </td>
-                <td>
-                    <% if (Array.isArray(pawn.goldItems)) { %>
-                        <% pawn.goldItems.forEach(gold => { %>
-                            <%= gold.typeName.typeName %><br>
-                        <% }); %>
-                    <% } else { %>
-                        N/A
-                    <% } %>
-                </td>
-                <td>
-                    <% if (Array.isArray(pawn.goldItems)) { %>
-                        <% pawn.goldItems.forEach(gold => { %>
-                            <%= gold.weight %> กรัม<br>
-                        <% }); %>
-                    <% } else { %>
-                        N/A
-                    <% } %>
-                </td>
-                <td>
-                    <% if (Array.isArray(pawn.goldItems)) { %>
-                        <% pawn.goldItems.forEach(gold => { %>
-                            <%= gold.principal.toLocaleString() %> บาท<br>
-                        <% }); %>
-                    <% } else { %>
-                        N/A
-                    <% } %>
-                </td>
-                <td>
-                    <% if (Array.isArray(pawn.goldItems)) { %>
-                        <% pawn.goldItems.forEach(gold => { %>
-                            <%= gold.interest %>%<br>
-                        <% }); %>
-                    <% } else { %>
-                        N/A
-                    <% } %>
-                </td>
-                <td>
-                    <% if (Array.isArray(pawn.goldItems)) { %>
-                        <% pawn.goldItems.forEach(gold => { %>
-                            <%= gold.intperm %>บาท<br>
-                        <% }); %>
-                    <% } else { %>
-                        N/A
-                    <% } %>
-                </td>
-                <td>
-                    <% if (Array.isArray(pawn.goldItems)) { %>
-                        <% pawn.goldItems.forEach(gold => { %>
-                            <%= gold.status %><br>
-                        <% }); %>
-                    <% } else { %>
-                        N/A
-                    <% } %>
-                </td>
+                <td><%= new Date(pawn.createdAt).toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' }) %></td>
             </tr>
         </tbody>
     </table>
