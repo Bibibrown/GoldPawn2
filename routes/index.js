@@ -34,6 +34,7 @@ router.get('/gold-list', async (req, res) => {
         $or: [
             { goldId: new RegExp(searchQuery, 'i') }, // ค้นหาจาก goldId
             { status: new RegExp(searchQuery, 'i') }, // ค้นหาจาก status
+            { typeName: new RegExp(searchQuery, 'i') } // ค้นหาจากประเภททอง
         ]
     };
 
@@ -45,7 +46,7 @@ router.get('/gold-list', async (req, res) => {
     }
 
     try {
-        const goldData = await GoldPawn.find(searchCriteria).populate('typeName', 'typeName'); // populate typeName
+        const goldData = await GoldPawn.find(searchCriteria); // ไม่ต้อง populate typeName
 
         // ส่งข้อมูลทองไปยัง view
         res.render('goldlist', { goldData, noData: goldData.length === 0 });
