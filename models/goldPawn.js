@@ -13,7 +13,7 @@ const goldSchema = new Schema({
         unique: true, // กำหนดให้ไม่ซ้ำกัน
     },
     typeName: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: String,
         ref: 'Type',
         required: true,
     },
