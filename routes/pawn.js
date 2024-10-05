@@ -138,7 +138,7 @@ router.post('/addpawn/:customerId', async (req, res) => {
         console.log(newGoldId)
 
         res.status(201).json({ 
-            message: 'Gold added successfully', 
+            message: 'เพิ่มข้อมูลทองที่จำนำเรียบร้อย', 
             pawn: existingPawn,
             gold: newGold,
             newPawnId: newPawnId,
