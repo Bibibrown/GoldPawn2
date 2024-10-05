@@ -103,7 +103,7 @@ router.post('/addpawn/:customerId', async (req, res) => {
         }
 
         const newGold = new Pawn({
-            pawnId: existingPawn._id,
+            pawnId: newPawnId,
             goldId: newGoldId,
             typeName: new mongoose.Types.ObjectId(typeName),
             weight: weight,
@@ -117,7 +117,7 @@ router.post('/addpawn/:customerId', async (req, res) => {
         await newGold.save();
         console.log('Gold saved:', newGold);
 
-        existingPawn.goldId.push(newGold._id);
+        existingPawn.goldId.push(newGoldId);
         await existingPawn.save();
         console.log('Pawn saved:', existingPawn);
 
