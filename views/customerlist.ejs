@@ -72,8 +72,8 @@
                             <th>นามสกุล</th>
                             <th>ที่อยู่</th>
                             <th>เบอร์โทร</th>
-                            <th style="border: none;">ข้อมูลจำนำ</th>
-                            <th style="border-style: none solid none none;"></th>
+                            <th>ข้อมูลจำนำ</th>
+                            <th>จัดการ</th>
                         </tr>
                     </thead>
                     <tbody id="customerTableBody">
@@ -101,7 +101,7 @@
                                         <td>
                                             <%= customer.customerPhone %>
                                         </td>
-                                        <td style="border: none;">
+                                        <td>
                                             <% if (customer.pawnId && customer.pawnId.length> 0) { %>
                                                 <% customer.pawnId.forEach(pawn=> { %>
                                                     <a href="/pawn/<%= pawn %>">
@@ -112,7 +112,7 @@
                                                             <span>ไม่มีข้อมูลจำนำ</span>
                                                             <% } %>
                                         </td>
-                                        <td style="border-style: none solid none none;">
+                                        <td>
                                             <button class="btn btn-danger"
                                                 onclick="deleteCustomer('<%= customer.customerId %>')">ลบ</button>
                                         </td>
