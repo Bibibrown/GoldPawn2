@@ -255,12 +255,15 @@
                     this.customerFName.value = customerFName;
                     this.customerLName.value = customerLName;
                     this.pawnId.value = pawnId;
+
+                    const currentGoldId = parseInt(document.getElementById('goldId').value.match(/\d+/)[0]); 
+                    const newGoldId = currentGoldId + 1;
                     
                     // อัปเดต goldId ใหม่
-                    document.getElementById('goldId').value = data.newGoldId;
+                    const formattedGoldId = newGoldId.toString().padStart(4, '0');
 
-                    // เพิ่มข้อมูลใหม่ลงในตารางประวัติการจำนำ
-                    addNewRowToPawnHistoryTable(data.gold);
+                    // อัปเดต goldId ใหม่
+                    document.getElementById('goldId').value = `G-${formattedGoldId}`;
 
                 }).catch(error => {
                     console.error('Error:', error);
