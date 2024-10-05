@@ -224,29 +224,63 @@
             }
 
             document.getElementById('goldPawnForm').addEventListener('submit', function(event) {
-        event.preventDefault(); // ป้องกันการรีเฟรชหน้า
-        
-        // คุณสามารถนำข้อมูลจากฟอร์มไปทำอย่างอื่นได้ เช่น ส่งผ่าน AJAX
-        const formData = new FormData(this);
+                event.preventDefault();
+                
+                const formData = new FormData(this);
+                const customerId = formData.get('customerId');
+                const data = Object.fromEntries(formData);
 
-        // แสดงข้อมูลที่เก็บใน formData
-        for (let [key, value] of formData.entries()) {
-            console.log(`${key}: ${value}`);
-        }
-        
-        // ตัวอย่างการส่งข้อมูลแบบ AJAX (ถ้าอยากส่งไปยังเซิร์ฟเวอร์)
-        fetch('/pawn/addpawn/${customerId}', {
-            method: 'POST',
-            body: formData
-        }).then(response => {
-            return response.json();
-        }).then(data => {
-            console.log(data); // แสดงผลหลังจากส่งข้อมูลสำเร็จ
-        }).catch(error => {
-            console.error('Error:', error);
-        });
-    });
+                fetch(`/pawn/addpawn/${customerId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                }).then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                }).then(data => {
+                    console.log(data);
+                    alert(data.message);
+                    
+                    // ล้างข้อมูลในฟอร์มยกเว้น customerId, customerFName, customerLName, และ pawnId
+                    const customerId = this.customerId.value;
+                    const customerFName = this.customerFName.value;
+                    const customerLName = this.customerLName.value;
+                    const pawnId = this.pawnId.value;
+                    this.reset();
+                    this.customerId.value = customerId;
+                    this.customerFName.value = customerFName;
+                    this.customerLName.value = customerLName;
+                    this.pawnId.value = pawnId;
+                    
+                    // อัปเดต goldId ใหม่
+                    document.getElementById('goldId').value = data.newGoldId;
 
+                    // เพิ่มข้อมูลใหม่ลงในตารางประวัติการจำนำ
+                    addNewRowToPawnHistoryTable(data.gold);
+
+                }).catch(error => {
+                    console.error('Error:', error);
+                    alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
+                });
+            });
+
+            function addNewRowToPawnHistoryTable(gold) {
+                const tableBody = document.getElementById('pawnHistoryTable');
+                const newRow = document.createElement('tr');
+                newRow.innerHTML = `
+                    <td><a href="/pawn/gold-payment-history/${gold.goldId}">${gold.goldId}</a></td>
+                    <td>${gold.typeName ? gold.typeName.typeName : 'N/A'}</td>
+                    <td>${gold.weight} กรัม</td>
+                    <td>${gold.principal} บาท</td>
+                    <td>${gold.intperm} บาท</td>
+                    <td>${gold.status}</td>
+                `;
+                tableBody.insertBefore(newRow, tableBody.firstChild);
+            }
         </script>
 </body>
 
