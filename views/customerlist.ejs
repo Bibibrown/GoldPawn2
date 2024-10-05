@@ -66,14 +66,14 @@
             <div class="table-wrapper">
                 <table class="table table-bordered">
                     <thead>
-                        <tr>
+                        <tr class="table-light">
                             <th>ID ลูกค้า</th>
                             <th>ชื่อ</th>
                             <th>นามสกุล</th>
                             <th>ที่อยู่</th>
                             <th>เบอร์โทร</th>
-                            <th>ข้อมูลจำนำ</th>
-                            <th></th>
+                            <th style="border: none;">ข้อมูลจำนำ</th>
+                            <th style="border-style: none solid none none;"></th>
                         </tr>
                     </thead>
                     <tbody id="customerTableBody">
@@ -101,7 +101,7 @@
                                         <td>
                                             <%= customer.customerPhone %>
                                         </td>
-                                        <td>
+                                        <td style="border: none;">
                                             <% if (customer.pawnId && customer.pawnId.length> 0) { %>
                                                 <% customer.pawnId.forEach(pawn=> { %>
                                                     <a href="/pawn/<%= pawn %>">
@@ -112,7 +112,7 @@
                                                             <span>ไม่มีข้อมูลจำนำ</span>
                                                             <% } %>
                                         </td>
-                                        <td>
+                                        <td style="border-style: none solid none none;">
                                             <button class="btn btn-danger"
                                                 onclick="deleteCustomer('<%= customer.customerId %>')">ลบ</button>
                                         </td>
