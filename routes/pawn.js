@@ -130,6 +130,11 @@ router.post('/addpawn/:customerId', async (req, res) => {
         // ดึงข้อมูล Gold ที่มี typeName populated
         const populatedGold = await Pawn.findById(newGold._id).populate('typeName');
 
+        console.log(existingPawn)
+        console.log(populatedGold)
+        console.log(newPawnId)
+        console.log(newGoldId)
+
         res.status(201).json({ 
             message: 'Gold added successfully', 
             pawn: existingPawn,
@@ -137,7 +142,6 @@ router.post('/addpawn/:customerId', async (req, res) => {
             newPawnId: newPawnId,
             newGoldId: newGoldId
         });
-
     } catch (error) {
         console.error('Error adding new gold:', error);
         res.status(500).json({ error: 'เกิดข้อผิดพลาดในการเพิ่มข้อมูลจำนำทอง', details: error.message });
