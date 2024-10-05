@@ -112,6 +112,49 @@ router.post('/addpawn', async (req, res) => {
     }
 });
 
+router.get('/:pawnId', async (req, res) => {
+    const { pawnId } = req.params;
+    try {
+        const pawn = await addPawn.findOne({ pawnId: pawnId }).populate('customerId');
+        
+        if (!pawn) {
+            return res.status(404).render('error', { message: 'ไม่พบข้อมูลจำนำ' });
+        }
+
+        // ค้นหาข้อมูล Gold ทั้งหมดที่เกี่ยวข้อง
+        const goldItems = await Pawn.find({ goldId: { $in: pawn.goldId } }).populate('typeName');
+
+        // รวมข้อมูล Pawn และ Gold
+        const pawnWithGold = { 
+            ...pawn.toObject(), 
+            goldItems: goldItems 
+        };
+
+        res.render('pawnlist', { pawn: pawnWithGold });
+    } catch (error) {
+        console.error('Error fetching pawn details:', error);
+        res.status(500).render('error', { message: 'เกิดข้อผิดพลาดในการดึงข้อมูลจำนำ' });
+    }
+});
+
+// router.get('/by-gold/:goldId', async (req, res) => {
+//     const { goldId } = req.params;
+//     try {
+//         const pawn = await Pawn.findOne({ goldId: goldId }).populate('customerId');
+//         if (!pawn) {
+//             return res.status(404).render('error', { message: 'ไม่พบข้อมูลจำนำ' });
+//         }
+        
+//         const goldItems = await Gold.find({ goldId: { $in: pawn.goldId } }).populate('typeName');
+//         const pawnWithGold = { ...pawn.toObject(), goldItems: goldItems };
+        
+//         res.render('pawnlist', { pawn: pawnWithGold });
+//     } catch (error) {
+//         console.error('Error fetching pawn details:', error);
+//         res.status(500).render('error', { message: 'เกิดข้อผิดพลาดในการดึงข้อมูลจำนำ' });
+//     }
+// });
+
 // // API Route เพื่อดึงประวัติการจำนำทองของลูกค้า
 // router.get('/:customerId', async (req, res) => {
 //     const { customerId } = req.params;

@@ -3,7 +3,7 @@ const Schema = mongoose.Schema;
 
 const goldSchema = new Schema({
     pawnId: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: String,
         ref: 'Pawn',
         required: true
     },

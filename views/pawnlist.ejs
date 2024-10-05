@@ -25,35 +25,92 @@
 
     <div class="container" style="margin-top: 7.7%;">
         <h2>ข้อมูลการจำนำของลูกค้า ID:</h2>
-        <table class="table table-bordered mt-3">
-            <thead>
-                <tr>
-                    <th>ID จำนำ</th>
-                    <th>วันที่จำนำ</th>
-                    <th>ทองที่จำนำ</th>
-                </tr>
-            </thead>
-            <tbody>
-                <% pawns.forEach(pawn=> { %>
-                    <tr>
-                        <td>
-                            <%= pawn.pawnId %>
-                        </td>
-                        <td>
-                            <%= pawn.pawnDate %>
-                        </td>
-                        <td>
-                            <!-- แสดง list ทองที่จำนำ กดเพื่อดูรายละเอียดธุรกรรมทองแต่ละ ID -->
-                            <% pawns.forEach(pawn=> { %>
-                                <a href="/pawn/gold-payment-history/<%= pawn.goldId %>">
-                                    <%= pawn.goldId %>
-                                </a>
-                                <% }); %>
-                        </td>
-                    </tr>
-                    <% }); %>
-            </tbody>
-        </table>
+        <% if (pawn) { %>
+    <table>
+        <thead>
+            <tr>
+                <th>Pawn ID</th>
+                <th>Gold ID</th>
+                <th>Type Name</th>
+                <th>Weight</th>
+                <th>Principal</th>
+                <th>Interest</th>
+                <th>Interest per Month</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><%= pawn.pawnId %></td>
+                <td>
+                    <% if (Array.isArray(pawn.goldId)) { %>
+                        <% pawn.goldId.forEach(goldId => { %>
+                            <a href="/pawn/gold-payment-history/<%= goldId %>"><%= goldId %></a><br>
+                        <% }); %>
+                    <% } else { %>
+                        N/A
+                    <% } %>
+                </td>
+                <td>
+                    <% if (Array.isArray(pawn.goldItems)) { %>
+                        <% pawn.goldItems.forEach(gold => { %>
+                            <%= gold.typeName.typeName %><br>
+                        <% }); %>
+                    <% } else { %>
+                        N/A
+                    <% } %>
+                </td>
+                <td>
+                    <% if (Array.isArray(pawn.goldItems)) { %>
+                        <% pawn.goldItems.forEach(gold => { %>
+                            <%= gold.weight %> กรัม<br>
+                        <% }); %>
+                    <% } else { %>
+                        N/A
+                    <% } %>
+                </td>
+                <td>
+                    <% if (Array.isArray(pawn.goldItems)) { %>
+                        <% pawn.goldItems.forEach(gold => { %>
+                            <%= gold.principal.toLocaleString() %> บาท<br>
+                        <% }); %>
+                    <% } else { %>
+                        N/A
+                    <% } %>
+                </td>
+                <td>
+                    <% if (Array.isArray(pawn.goldItems)) { %>
+                        <% pawn.goldItems.forEach(gold => { %>
+                            <%= gold.interest %>%<br>
+                        <% }); %>
+                    <% } else { %>
+                        N/A
+                    <% } %>
+                </td>
+                <td>
+                    <% if (Array.isArray(pawn.goldItems)) { %>
+                        <% pawn.goldItems.forEach(gold => { %>
+                            <%= gold.intperm %>บาท<br>
+                        <% }); %>
+                    <% } else { %>
+                        N/A
+                    <% } %>
+                </td>
+                <td>
+                    <% if (Array.isArray(pawn.goldItems)) { %>
+                        <% pawn.goldItems.forEach(gold => { %>
+                            <%= gold.status %><br>
+                        <% }); %>
+                    <% } else { %>
+                        N/A
+                    <% } %>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+<% } else { %>
+    <p>ไม่พบข้อมูลการจำนำ</p>
+<% } %>
     </div>
 </body>
 
