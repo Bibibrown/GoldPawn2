@@ -64,7 +64,7 @@ router.post('/addpawn', async (req, res) => {
         // สร้าง Pawn ใหม่
         const newPawn = new addPawn({
             pawnId: newPID, // ตัวอย่างการสร้าง pawnId แบบไม่ซ้ำ
-            customerId: customer._id,
+            customerId: customer.customerId,
             goldId: [] // เริ่มต้นเป็น array ว่าง
         });
 

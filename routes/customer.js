@@ -1,6 +1,8 @@
+const mongoose = require('mongoose');
 const express = require('express');
 const router = express.Router();
 const Customer = require('../models/customer'); // อ้างอิงโมเดล Customer
+const Pawn = require('../models/pawn');
 
 // Middleware สำหรับตรวจสอบข้อมูลลูกค้า
 function validateCustomerData(req, res, next) {
@@ -104,6 +106,29 @@ router.post('/', validateCustomerData, async (req, res) => {
     } catch (error) {
         console.error('Create Customer Error:', error);
         res.status(500).json({ message: 'เกิดข้อผิดพลาดในการเพิ่มข้อมูลลูกค้า' });
+    }
+});
+
+// DELETE สำหรับลบข้อมูลลูกค้าและการจำนำที่เชื่อมโยง
+router.delete('/:customerId', async (req, res) => {
+    try {
+        const { customerId } = req.params;
+
+        // ค้นหาการจำนำที่เกี่ยวข้อง
+        const pawns = await Pawn.find({ customerId: customerId });
+
+        // ลบการจำนำที่พบ
+        if (pawns.length > 0) {
+            await Pawn.deleteMany({ customerId: customerId });
+        }
+
+        // ลบลูกค้า
+        await Customer.deleteOne({ customerId: customerId });
+
+        res.status(200).json({ message: 'Customer and related pawns deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting customer and related pawns:', error);
+        res.status(500).json({ message: 'Error deleting customer and related pawns' });
     }
 });
 
