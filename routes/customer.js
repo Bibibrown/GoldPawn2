@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Customer = require('../models/customer'); // อ้างอิงโมเดล Customer
+const addPawn = require('../models/pawn');
 
 // Middleware สำหรับตรวจสอบข้อมูลลูกค้า
 function validateCustomerData(req, res, next) {
@@ -104,6 +105,28 @@ router.post('/', validateCustomerData, async (req, res) => {
     } catch (error) {
         console.error('Create Customer Error:', error);
         res.status(500).json({ message: 'เกิดข้อผิดพลาดในการเพิ่มข้อมูลลูกค้า' });
+    }
+});
+
+// DELETE สำหรับลบข้อมูลลูกค้าและจำนำที่เชื่อมโยง
+router.delete('/:customerId', async (req, res) => {
+    const { customerId } = req.params;
+
+    try {
+        // ลบข้อมูลลูกค้า
+        const deletedCustomer = await Customer.findOneAndDelete({ customerId });
+
+        if (!deletedCustomer) {
+            return res.status(404).json({ message: 'ไม่พบข้อมูลลูกค้าที่ต้องการลบ' });
+        }
+
+        // ลบข้อมูลจำนำที่เชื่อมโยงกับลูกค้านั้น
+        await GoldPawn.deleteMany({ customerId: customerId });
+
+        res.status(200).json({ message: 'ลบข้อมูลลูกค้าและจำนำสำเร็จ', deletedCustomer });
+    } catch (error) {
+        console.error('Error deleting customer and related gold pawns:', error);
+        res.status(500).json({ message: 'เกิดข้อผิดพลาดในการลบข้อมูลลูกค้าและจำนำ', error });
     }
 });
 

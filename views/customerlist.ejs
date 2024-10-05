@@ -73,6 +73,7 @@
                             <th>ที่อยู่</th>
                             <th>เบอร์โทร</th>
                             <th>ข้อมูลจำนำ</th>
+                            <th></th>
                         </tr>
                     </thead>
                     <tbody id="customerTableBody">
@@ -111,6 +112,10 @@
                                                             <span>ไม่มีข้อมูลจำนำ</span>
                                                             <% } %>
                                         </td>
+                                        <td>
+                                            <button class="btn btn-danger"
+                                                onclick="deleteCustomer('<%= customer.customerId %>')">ลบ</button>
+                                        </td>
                                     </tr>
                                     <% }); %>
                                         <% } %>
@@ -136,6 +141,23 @@
 
                     row.style.display = isMatch ? '' : 'none';
                 });
+            }
+
+            function deleteCustomer(customerId) {
+                if (confirm('คุณต้องการลบข้อมูลลูกค้าคนนี้หรือไม่?')) {
+                    fetch(`/customer/${customerId}`, {
+                        method: 'DELETE'
+                    }).then(response => {
+                        if (response.ok) {
+                            alert('ลบข้อมูลลูกค้าสำเร็จ');
+                            location.reload(); // โหลดหน้าใหม่หลังจากลบสำเร็จ
+                        } else {
+                            alert('เกิดข้อผิดพลาดในการลบข้อมูล');
+                        }
+                    }).catch(error => {
+                        console.error('Error deleting customer:', error);
+                    });
+                }
             }
         </script>
 </body>

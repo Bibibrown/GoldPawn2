@@ -133,6 +133,7 @@
                                 <tr>
                                     <th>ID ประเภท</th>
                                     <th>ชื่อประเภททอง</th>
+                                    <th></th>
                                 </tr>
                             </thead>
                             <tbody id="goldTypeTableBody">
@@ -251,14 +252,37 @@
             types.forEach(type => {
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${type.typeId}</td>
-                    <td>${type.typeName}</td>
-                `;
+                <td>${type.typeId}</td>
+                <td>${type.typeName}</td>
+                <td>
+                    <button class="btn btn-danger" onclick="deleteGoldType('${type.typeId}')">ลบ</button>
+                </td>
+            `;
                 tableBody.appendChild(row);
             });
 
         } catch (error) {
             console.error('Error loading gold types:', error);
+        }
+    }
+
+    // ฟังก์ชันสำหรับลบประเภททอง
+    async function deleteGoldType(typeId) {
+        if (confirm('คุณต้องการลบประเภททองนี้หรือไม่?')) {
+            try {
+                const response = await fetch(`/add-data/types/${typeId}`, {
+                    method: 'DELETE',
+                });
+
+                if (response.ok) {
+                    alert('ลบประเภททองสำเร็จ');
+                    loadGoldTypes(); // โหลดข้อมูลใหม่หลังจากลบสำเร็จ
+                } else {
+                    alert('เกิดข้อผิดพลาดในการลบประเภททอง');
+                }
+            } catch (error) {
+                console.error('Error deleting gold type:', error);
+            }
         }
     }
 

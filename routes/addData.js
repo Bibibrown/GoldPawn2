@@ -60,4 +60,21 @@ router.get('/latest-id', async (req, res) => {
     }
 });
 
+// DELETE สำหรับลบประเภททองโดยใช้ typeId
+router.delete('/types/:typeId', async (req, res) => {
+    try {
+        const typeId = req.params.typeId;
+        const deletedType = await Type.findOneAndDelete({ typeId: typeId }); // ลบประเภททองตาม typeId
+
+        if (!deletedType) {
+            return res.status(404).json({ message: 'ไม่พบประเภททองที่ต้องการลบ' });
+        }
+
+        res.status(200).json({ message: 'ลบประเภททองสำเร็จ', deletedType });
+    } catch (error) {
+        console.error('Error deleting gold type:', error);
+        res.status(500).json({ message: 'เกิดข้อผิดพลาดในการลบประเภททอง', error });
+    }
+});
+
 module.exports = router;
