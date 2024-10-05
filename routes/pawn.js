@@ -93,6 +93,18 @@ router.post('/addpawn', async (req, res) => {
         customer.pawnId.push(newPawn.pawnId);
         await customer.save();
 
+        console.log('Customer ID:', customer._id);
+        
+        // ดึงข้อมูลที่เพิ่งถูกสร้างและส่งไปยังหน้าแสดงผล
+        const pawns = await Pawn.find({ customerId: customer._id })
+            .populate({
+                path: 'goldId',
+                populate: { path: 'typeName' }
+            })
+            .sort({ createdAt: 1 });
+
+        console.log('Pawns:', JSON.stringify(pawns, null, 2));
+
         res.redirect(`/pawn/addpawn/${encodeURIComponent(customerId)}`);
     } catch (error) {
         console.error('Error adding new pawn:', error);
