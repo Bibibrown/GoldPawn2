@@ -9,8 +9,7 @@
     <script src="/bootstrap/js/bootstrap.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@200;300;400;500;600;700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             font-family: "Mitr", sans-serif;
@@ -34,24 +33,22 @@
                 </tr>
             </thead>
             <tbody>
-                <% pawns.forEach(pawn=> { %>
+                <% pawns.forEach(pawn => { %>
                     <tr>
                         <td>
                             <%= pawn.pawnId %>
                         </td>
                         <td>
-                            
+                            <%= new Date(pawn.createdAt).toLocaleDateString('th-TH') %>
                         </td>
                         <td>
                             <!-- แสดง list ทองที่จำนำ กดเพื่อดูรายละเอียดธุรกรรมทองแต่ละ ID -->
-                            <% pawns.forEach(pawn=> { %>
-                                <a href="/pawn/gold-payment-history/<%= pawn.goldId %>">
-                                    <%= pawn.goldId %>
-                                </a>
-                                <% }); %>
+                            <a href="/pawn/gold-payment-history/<%= pawn.goldId %>">
+                                <%= pawn.goldId %>
+                            </a>
                         </td>
                     </tr>
-                    <% }); %>
+                <% }); %>
             </tbody>
         </table>
     </div>
