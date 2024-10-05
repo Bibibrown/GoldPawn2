@@ -72,19 +72,18 @@
                                     <%= pawn.pawnId %>
                                 </td>
                                 <td>
-                                    <% if (Array.isArray(pawn.goldId)) { %>
-                                        <% pawn.goldId.forEach(goldId=> { %>
-                                            <a href="/pawn/gold-payment-history/<%= goldId %>">
-                                                <%= goldId %>
+                                    <% if (golds && golds.length > 0) { %>
+                                        <% golds.forEach(gold => { %>
+                                            <a href="/pawn/gold-payment-history/<%= gold.id %>">
+                                                <%= gold.id %>
                                             </a><br>
-                                            <% }); %>
-                                                <% } else { %>
-                                                    N/A
-                                                    <% } %>
+                                        <% }); %>
+                                    <% } else { %>
+                                        N/A
+                                    <% } %>
                                 </td>
                                 <td>
-                                    <%= new Date(pawn.createdAt).toLocaleDateString('th-TH', { year: 'numeric' ,
-                                        month: 'long' , day: 'numeric' }) %>
+                                    <%= new Date(pawn.createdAt).toLocaleDateString('th-TH', { year: 'numeric', month: 'long', day: 'numeric' }) %>
                                 </td>
                             </tr>
                         </tbody>
