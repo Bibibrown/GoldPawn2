@@ -256,14 +256,7 @@
                     this.customerLName.value = customerLName;
                     this.pawnId.value = pawnId;
 
-                    const currentGoldId = parseInt(document.getElementById('goldId').value.match(/\d+/)[0]); 
-                    const newGoldId = currentGoldId + 1;
-                    
-                    // อัปเดต goldId ใหม่
-                    const formattedGoldId = newGoldId.toString().padStart(4, '0');
 
-                    // อัปเดต goldId ใหม่
-                    document.getElementById('goldId').value = `G-${formattedGoldId}`;
 
                 }).catch(error => {
                     console.error('Error:', error);
