@@ -210,9 +210,94 @@
         <footer class="mt-5"></footer>
 
         <script>
+<<<<<<< HEAD
+            // คำนวณดอกเบี้ยตามเปอร์เซ็นต์ที่กรอก
+            function calculateTotal() {
+                const principal = parseFloat(document.getElementById('principal').value) || 0; // เงินต้น
+                const interestPercent = parseFloat(document.getElementById('interest').value) || 0; // ดอกเบี้ย
+
+                if (principal < 0 || interestPercent < 0) {
+                    alert("เงินต้นและดอกเบี้ยต้องไม่เป็นค่าลบ");
+                    return;
+                }
+
+                const interest = (principal * (interestPercent / 100)).toFixed(2); // คำนวณดอกเบี้ย
+                document.getElementById('intperm').value = interest; // แสดงผลในช่อง intperm
+            }
+
+                // เพิ่มฟังก์ชัน addNewRowToPawnHistoryTable
+            function addNewRowToPawnHistoryTable(gold) {
+                const table = document.getElementById('pawnHistoryTable');
+                const newRow = table.insertRow();
+                newRow.innerHTML = `
+                    <td><a href="/pawn/gold-payment-history/${gold.goldId}">${gold.goldId}</a></td>
+                    <td>${gold.typeName}</td>
+                    <td>${gold.weight} กรัม</td>
+                    <td>${gold.principal} บาท</td>
+                    <td>${gold.intperm} บาท</td>
+                    <td>${gold.status}</td>
+                `;
+            }
+
+            let currentGoldId = parseInt(document.getElementById('goldId').value.match(/\d+/)[0]);
+
+            function updateGoldId() {
+                currentGoldId++;
+                const formattedGoldId = currentGoldId.toString().padStart(4, '0');
+                document.getElementById('goldId').value = `G-${formattedGoldId}`;
+            }
+
+            document.getElementById('goldPawnForm').addEventListener('submit', function(event) {
+                event.preventDefault();
+                
+                const formData = new FormData(this);
+                const customerId = formData.get('customerId');
+                const data = Object.fromEntries(formData);
+
+                fetch(`/pawn/addpawn/${customerId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                }).then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                }).then(data => {
+                    console.log(data);
+                    alert(data.message);
+                    
+                    // เพิ่มข้อมูลใหม่ลงในตาราง
+                    addNewRowToPawnHistoryTable(data.gold);
+
+                    // ล้างข้อมูลในฟอร์มยกเว้น customerId, customerFName, customerLName, และ pawnId
+                    const customerId = this.customerId.value;
+                    const customerFName = this.customerFName.value;
+                    const customerLName = this.customerLName.value;
+                    const pawnId = this.pawnId.value;
+                    this.reset();
+                    this.customerId.value = customerId;
+                    this.customerFName.value = customerFName;
+                    this.customerLName.value = customerLName;
+                    this.pawnId.value = pawnId;
+
+                    // อัปเดต goldId ใหม่
+                    updateGoldId();
+
+                }).catch(error => {
+                    console.error('Error:', error);
+                    alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
+                });
+            });
+
+            
+=======
             document.getElementById('goldPawnForm').addEventListener('submit', submitPawnForm);
             document.getElementById('principal').addEventListener('input', calculateTotal);
             document.getElementById('interest').addEventListener('input', calculateTotal);
+>>>>>>> 123b4058bd3c43a46f1368d7c6ea9d5485467be7
         </script>
 </body>
 
