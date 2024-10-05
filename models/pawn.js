@@ -7,7 +7,7 @@ const pawnSchema = new Schema({
         unique: true // กำหนดให้ไม่ซ้ำกัน
     },
     customerId: {
-        type: mongoose.Schema.Types.ObjectId, // อ้างอิงถึง customerId ในฝั่ง customer
+        type: String, // อ้างอิงถึง customerId ในฝั่ง customer
         ref: 'Customer', // กำหนดความสัมพันธ์กับ customer model
         required: true
     },
