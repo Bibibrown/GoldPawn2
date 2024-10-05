@@ -63,7 +63,7 @@
                 <!-- ส่วนสำหรับฟอร์มกรอกข้อมูลจำนำทอง -->
                 <div class="col-md-5">
                     <h2>เพิ่มข้อมูลจำนำทอง</h2>
-                    <form id="goldPawnForm" action="/pawn/addpawn" method="POST">
+                    <form id="goldPawnForm" action="/pawn/addpawn/<%= customer.customerId %>" method="POST">
                         <h4 class="mb-3">รายละเอียดลูกค้า</h4>
                         <div class="mb-3 row">
                             <label for="customerId" class="col-sm-2 col-form-label">ID ลูกค้า</label>
@@ -86,6 +86,12 @@
                         </div>
                         <h4 class="mb-3">รายละเอียดทอง</h4>
                         <div class="mb-3 row">
+                            <label for="pawnId" class="col-sm-2 col-form-label">ID จำนำ</label>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control" id="pawnId" name="pawnId"
+                                    value="<%= newPID %>" readonly>
+                            </div>
+
                             <label for="goldId" class="col-sm-2 col-form-label">ID ทอง</label>
                             <div class="col-sm">
                                 <input type="text" class="form-control" id="goldId" name="goldId"
@@ -154,7 +160,7 @@
 
                 <!-- ส่วนสำหรับแสดงตารางประวัติการจำนำ -->
                 <div class="col-md-6">
-                    <h2>ทองที่จำนำ</h2>
+                    <h2>ทองที่จำนำ  <span style="font-size: 0.6em;"> ID : <%= newPID %></span></h2>                    
                     <div class="table-wrapper">
                         <table class="table table-bordered">
                             <thead>
@@ -217,7 +223,64 @@
                 document.getElementById('intperm').value = interest; // แสดงผลในช่อง intperm
             }
 
-            // ไม่จำเป็นต้องใช้ JavaScript สำหรับการส่งฟอร์ม เพราะใช้การส่งแบบธรรมดาแล้ว
+            document.getElementById('goldPawnForm').addEventListener('submit', function(event) {
+                event.preventDefault();
+                
+                const formData = new FormData(this);
+                const customerId = formData.get('customerId');
+                const data = Object.fromEntries(formData);
+
+                fetch(`/pawn/addpawn/${customerId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                }).then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                }).then(data => {
+                    console.log(data);
+                    alert(data.message);
+                    
+                    // ล้างข้อมูลในฟอร์มยกเว้น customerId, customerFName, customerLName, และ pawnId
+                    const customerId = this.customerId.value;
+                    const customerFName = this.customerFName.value;
+                    const customerLName = this.customerLName.value;
+                    const pawnId = this.pawnId.value;
+                    this.reset();
+                    this.customerId.value = customerId;
+                    this.customerFName.value = customerFName;
+                    this.customerLName.value = customerLName;
+                    this.pawnId.value = pawnId;
+                    
+                    // อัปเดต goldId ใหม่
+                    document.getElementById('goldId').value = data.newGoldId;
+
+                    // เพิ่มข้อมูลใหม่ลงในตารางประวัติการจำนำ
+                    addNewRowToPawnHistoryTable(data.gold);
+
+                }).catch(error => {
+                    console.error('Error:', error);
+                    alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
+                });
+            });
+
+            function addNewRowToPawnHistoryTable(gold) {
+                const tableBody = document.getElementById('pawnHistoryTable');
+                const newRow = document.createElement('tr');
+                newRow.innerHTML = `
+                    <td><a href="/pawn/gold-payment-history/${gold.goldId}">${gold.goldId}</a></td>
+                    <td>${gold.typeName ? gold.typeName.typeName : 'N/A'}</td>
+                    <td>${gold.weight} กรัม</td>
+                    <td>${gold.principal} บาท</td>
+                    <td>${gold.intperm} บาท</td>
+                    <td>${gold.status}</td>
+                `;
+                tableBody.insertBefore(newRow, tableBody.firstChild);
+            }
         </script>
 </body>
 

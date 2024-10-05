@@ -1,10 +1,28 @@
 const express = require('express');
 const router = express.Router();
+const mongoose = require('mongoose');
 const Customer = require('../models/customer');
 const Pawn = require('../models/goldPawn');
 const Payment = require('../models/payment');
 const addPawn = require('../models/pawn');
 const Type = require('../models/type'); 
+
+
+async function generateGoldId() {
+    const lastGold = await Pawn.findOne().sort({ createdAt: -1 });
+    if (!lastGold) return 'G-0001';
+    const lastId = parseInt(lastGold.goldId.split('-')[1]);
+    const newGoldId = lastId + 1;
+    return `G-${String(newGoldId).padStart(4, '0')}`;
+}
+
+async function generatePawnId() {
+    const lastPawn = await addPawn.findOne().sort({ createdAt: -1 });
+    if (!lastPawn) return 'P-0001';
+    const lastId = parseInt(lastPawn.pawnId.split('-')[1]);
+    const newPawnId = lastId + 1;
+    return `P-${String(newPawnId).padStart(4, '0')}`;
+}
 
 // เส้นทางเพื่อแสดงหน้า Add Gold Pawn สำหรับลูกค้า
 router.get('/addpawn/:customerId', async (req, res) => {
@@ -36,23 +54,7 @@ router.get('/addpawn/:customerId', async (req, res) => {
             return `G-${String(newGoldId).padStart(4, '0')}`; // คืนค่า typeId ใหม่
         }
         const newGoldId = await generateGoldId();
-        // ส่งข้อมูลลูกค้า, ประวัติการจำนำทอง, และ customerId ไปยังหน้า addpawn.ejs
-        res.render('addpawn', { customer, pawns, customerId: customer.customerId, newGoldId, typeList});
-    } catch (error) {
-        console.error('Error fetching customer or pawn history:', error);
-        res.status(500).render('error', { message: 'เกิดข้อผิดพลาดในการดึงข้อมูล' });
-    }
-});
 
-// เส้นทางเพื่อจัดการการเพิ่มการจำนำทองใหม่ (POST)
-router.post('/addpawn', async (req, res) => {
-    const { customerId, goldId, goldTypeName, weight, principal, interest, intperm } = req.body;
-    try {
-        // หาลูกค้าตาม customerId
-        const customer = await Customer.findOne({ customerId: customerId });
-        if (!customer) {
-            return res.status(404).render('error', { message: 'ไม่พบลูกค้า' });
-        }
         async function generatePawnId() {
             const lastPawn = await addPawn.findOne().sort({ createdAt: -1 }); // หาข้อมูลล่าสุด
             if (!lastPawn) return 'P-0001'; // ถ้าไม่มีข้อมูลเลย
@@ -61,95 +63,149 @@ router.post('/addpawn', async (req, res) => {
             return `P-${String(newPawnId).padStart(4, '0')}`; // คืนค่า typeId ใหม่
         }
         const newPID = await generatePawnId();
-        // สร้าง Pawn ใหม่
-        const newPawn = new addPawn({
-            pawnId: newPID, // ตัวอย่างการสร้าง pawnId แบบไม่ซ้ำ
-            customerId: customer.customerId,
-            goldId: [] // เริ่มต้นเป็น array ว่าง
-        });
 
-        await newPawn.save();
+        // ส่งข้อมูลลูกค้า, ประวัติการจำนำทอง, และ customerId ไปยังหน้า addpawn.ejs
+        res.render('addpawn', { customer, pawns, customerId: customer.customerId, newGoldId, newPID, typeList});
+    } catch (error) {
+        console.error('Error fetching customer or pawn history:', error);
+        res.status(500).render('error', { message: 'เกิดข้อผิดพลาดในการดึงข้อมูล' });
+    }
+});
 
-        // สร้าง Gold ใหม่ที่อ้างอิงถึง Pawn นี้
+
+// เส้นทางเพื่อจัดการการเพิ่มการจำนำทองใหม่ (POST)
+router.post('/addpawn/:customerId', async (req, res) => {
+    console.log('Request body:', req.body);
+    console.log('Request params:', req.params);
+    const { customerId } = req.params;
+    const { pawnId, typeName, weight, principal, interest, intperm } = req.body;
+    
+    try {
+        const customer = await Customer.findOne({ customerId: customerId });
+        if (!customer) {
+            return res.status(404).json({ error: 'ไม่พบลูกค้า' });
+        }
+
+        // ใช้ pawnId ที่ส่งมาจาก client
+        const newPawnId = pawnId;
+        const newGoldId = await generateGoldId();
+
+        // ตรวจสอบว่ามี pawn ที่มี pawnId นี้อยู่แล้วหรือไม่
+        let existingPawn = await addPawn.findOne({ pawnId: newPawnId });
+        
+        if (!existingPawn) {
+            // ถ้ายังไม่มี pawn นี้ ให้สร้างใหม่
+            existingPawn = new addPawn({
+                pawnId: newPawnId,
+                customerId: customer.customerId,
+                goldId: []
+            });
+        }
+
         const newGold = new Pawn({
-            pawnId: newPawn._id,
-            goldId: req.body.goldId || 'GOLD-' + newPawn._id, // กำหนด goldId ตามที่คุณต้องการ
-            typeName: req.body.typeName, // ควรรับค่า typeName จากฟอร์ม
+            pawnId: existingPawn._id,
+            goldId: newGoldId,
+            typeName: new mongoose.Types.ObjectId(typeName),
             weight: weight,
             principal: principal,
             interest: interest,
             intperm: intperm,
             status: 'จำนำ',
-            paymentId: [] // เริ่มต้นเป็น array ว่าง
+            paymentId: []
         });
 
         await newGold.save();
+        console.log('Gold saved:', newGold);
 
-        // เพิ่ม goldId ลงใน Pawn
-        newPawn.goldId.push(newGold.goldId);
-        await newPawn.save();
+        existingPawn.goldId.push(newGold._id);
+        await existingPawn.save();
+        console.log('Pawn saved:', existingPawn);
 
-        // เพิ่ม pawnId ลงในลูกค้า
-        customer.pawnId.push(newPawn.pawnId);
-        await customer.save();
+        if (!customer.pawnId.includes(existingPawn.pawnId)) {
+            customer.pawnId.push(existingPawn.pawnId);
+            await customer.save();
+            console.log('Customer updated:', customer);
+        }
 
-        console.log('Customer ID:', customer._id);
-        
-        // ดึงข้อมูลที่เพิ่งถูกสร้างและส่งไปยังหน้าแสดงผล
-        const pawns = await Pawn.find({ customerId: customer._id })
+        // ดึงข้อมูล Gold ที่มี typeName populated
+        const populatedGold = await Pawn.findById(newGold._id).populate('typeName');
+
+        res.status(201).json({ 
+            message: 'Gold added successfully', 
+            pawn: existingPawn,
+            gold: populatedGold,
+            newPawnId: newPawnId,
+            newGoldId: newGoldId
+        });
+
+    } catch (error) {
+        console.error('Error adding new gold:', error);
+        res.status(500).json({ error: 'เกิดข้อผิดพลาดในการเพิ่มข้อมูลจำนำทอง', details: error.message });
+    }
+});
+
+router.get('/getNewIds/:customerId', async (req, res) => {
+    const { customerId } = req.params;
+    // สร้างลอจิกสำหรับการสร้าง ID ใหม่
+    const newPID = 'P-' + (Math.floor(Math.random() * 10000)).toString().padStart(4, '0');
+    const newGoldId = 'G-' + (Math.floor(Math.random() * 10000)).toString().padStart(4, '0');
+    res.json({ newPID, newGoldId });
+});
+
+router.get('/history/:customerId', async (req, res) => {
+    const { customerId } = req.params;
+    try {
+        const pawns = await addPawn.find({ customerId })
             .populate({
                 path: 'goldId',
                 populate: { path: 'typeName' }
             })
-            .sort({ createdAt: 1 });
-
-        console.log('Pawns:', JSON.stringify(pawns, null, 2));
-
-        res.redirect(`/pawn/addpawn/${encodeURIComponent(customerId)}`);
+            .sort({ createdAt: -1 });
+        res.json(pawns);
     } catch (error) {
-        console.error('Error adding new pawn:', error);
-        res.status(500).render('error', { message: 'เกิดข้อผิดพลาดในการเพิ่มข้อมูลจำนำทอง' });
+        console.error('Error fetching pawn history:', error);
+        res.status(500).json({ error: 'เกิดข้อผิดพลาดในการดึงประวัติการจำนำ' });
     }
 });
 
-router.get('/:pawnId', async (req, res) => {
-    const { pawnId } = req.params;
-    try {
-        console.log('Searching for pawnId:', pawnId);
-        // ค้นหา Pawn โดยใช้ pawnId แทน _id
-        const pawn = await addPawn.findOne({ pawnId: pawnId });
-        
-        if (!pawn) {
-            console.log('Pawn not found');
-            return res.status(404).render('error', { message: 'ไม่พบข้อมูลจำนำ' });
-        }
+// router.get('/:pawnId', async (req, res) => {
+//     const { pawnId } = req.params;
+//     try {
+//         console.log('Searching for pawnId:', pawnId);
+//         // ค้นหา Pawn โดยใช้ pawnId แทน _id
+//         const pawn = await addPawn.findOne({ pawnId: pawnId });
+//         
+//         if (!pawn) {
+//             console.log('Pawn not found');
+//             return res.status(404).render('error', { message: 'ไม่พบข้อมูลจำนำ' });
+//         }
 
-        console.log('Pawn found:', JSON.stringify(pawn, null, 2));
+//         console.log('Pawn found:', JSON.stringify(pawn, null, 2));
 
-        // ค้นหา Customer โดยใช้ customerId แทน _id
-        const customer = await Customer.findOne({ customerId: pawn.customerId });
+//         // ค้นหา Customer โดยใช้ customerId แทน _id
+//         const customer = await Customer.findOne({ customerId: pawn.customerId });
 
-        if (!customer) {
-            console.log('Customer not found');
-            return res.status(404).render('error', { message: 'ไม่พบข้อมูลลูกค้า' });
-        }
+//         if (!customer) {
+//             console.log('Customer not found');
+//             return res.status(404).render('error', { message: 'ไม่พบข้อมูลลูกค้า' });
+//         }
 
-        // ค้นหาข้อมูล Gold
-        const goldItems = await Pawn.find({ goldId: { $in: pawn.goldId } }).populate('typeName');
-        console.log('Gold items found:', JSON.stringify(goldItems, null, 2));
+//         // ค้นหาข้อมูล Gold
+//         const goldItems = await Pawn.find({ goldId: { $in: pawn.goldId } }).populate('typeName');
+//         console.log('Gold items found:', JSON.stringify(goldItems, null, 2));
 
-        const pawnWithGold = {
-            ...pawn.toObject(),
-            goldItems: goldItems,
-            customer: customer // เพิ่มข้อมูลลูกค้าเข้าไปใน object
-        };
+//         const pawnWithGold = {
+//             ...pawn.toObject(),
+//             goldItems: goldItems,
+//             customer: customer // เพิ่มข้อมูลลูกค้าเข้าไปใน object
+//         };
 
-        res.render('pawnlist', { pawn: pawnWithGold });
-    } catch (error) {
-        console.error('Detailed error:', error);
-        res.status(500).render('error', { message: 'เกิดข้อผิดพลาดในการดึงข้อมูลจำนำ: ' + error.message });
-    }
-});
+//         res.render('pawnlist', { pawn: pawnWithGold });
+//     } catch (error) {
+//         console.error('Detailed error:', error);
+//         res.status(500).render('error', { message: 'เกิดข้อผิดพลาดในการดึงข้อมูลจำนำ: ' + error.message });
+//     }
+// });
 
 // router.get('/by-gold/:goldId', async (req, res) => {
 //     const { goldId } = req.params;
@@ -158,10 +214,10 @@ router.get('/:pawnId', async (req, res) => {
 //         if (!pawn) {
 //             return res.status(404).render('error', { message: 'ไม่พบข้อมูลจำนำ' });
 //         }
-        
+//         
 //         const goldItems = await Gold.find({ goldId: { $in: pawn.goldId } }).populate('typeName');
 //         const pawnWithGold = { ...pawn.toObject(), goldItems: goldItems };
-        
+//         
 //         res.render('pawnlist', { pawn: pawnWithGold });
 //     } catch (error) {
 //         console.error('Error fetching pawn details:', error);
@@ -240,7 +296,7 @@ router.get('/:pawnId', async (req, res) => {
 
 //         // เพิ่มการชำระเงินพร้อมกัน
 //         await addPayment(goldId);
-        
+//         
 
 //         // ส่งการตอบกลับ
 //         res.status(201).json({ message: 'เพิ่มข้อมูลจำนำทองเรียบร้อย' });

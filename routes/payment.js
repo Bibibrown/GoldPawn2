@@ -7,21 +7,25 @@ router.get('/', async (req, res) => {
     res.render('golddetail');
 });
 
-// router.get('/gold/:goldId', async (req, res) => {
-//     const { goldId } = req.params; // รับ goldId ที่ส่งมาใน URL
-//     try {
-//         // ดึงข้อมูลการชำระเงินจากฐานข้อมูลตาม goldId
-//         const payments = await Payment.find({ goldId: goldId }); // ใช้ find แทน findById
-//         if (!payments.length) {
-//             return res.status(404).json({ message: 'ไม่พบการชำระเงินที่ระบุสำหรับ goldId นี้' });
-//         }
-//         // ส่งข้อมูลการชำระเงินในรูปแบบ JSON
-//         res.json(payments);
-//     } catch (error) {
-//         console.error('Error fetching payment details:', error);
-//         res.status(500).json({ message: 'เกิดข้อผิดพลาดในการดึงข้อมูลการชำระเงิน' });
-//     }
-// });
+router.get('/gold-payment-history/:goldId', async (req, res) => {
+    try {
+        const { goldId } = req.params;
+        
+        // ดึงข้อมูลทอง
+        const gold = await Pawn.findOne({ goldId }).populate('typeName');
+        if (!gold) {
+            return res.status(404).render('error', { message: 'ไม่พบข้อมูลทอง' });
+        }
+
+        // ดึงประวัติการชำระเงิน
+        const payments = await Payment.find({ goldId }).sort({ paymentDate: -1 });
+
+        res.render('golddetail', { gold, payments });
+    } catch (error) {
+        console.error('Error fetching gold payment history:', error);
+        res.status(500).render('error', { message: 'เกิดข้อผิดพลาดในการดึงข้อมูลประวัติการชำระเงินทอง' });
+    }
+});
 
 
 // // เส้นทางเพื่อเพิ่มการชำระเงินใหม่
