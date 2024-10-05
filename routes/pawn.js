@@ -115,25 +115,39 @@ router.post('/addpawn', async (req, res) => {
 router.get('/:pawnId', async (req, res) => {
     const { pawnId } = req.params;
     try {
-        const pawn = await addPawn.findOne({ pawnId: pawnId }).populate('customerId');
+        console.log('Searching for pawnId:', pawnId);
+        // ค้นหา Pawn โดยใช้ pawnId แทน _id
+        const pawn = await addPawn.findOne({ pawnId: pawnId });
         
         if (!pawn) {
+            console.log('Pawn not found');
             return res.status(404).render('error', { message: 'ไม่พบข้อมูลจำนำ' });
         }
 
-        // ค้นหาข้อมูล Gold ทั้งหมดที่เกี่ยวข้อง
-        const goldItems = await Pawn.find({ goldId: { $in: pawn.goldId } }).populate('typeName');
+        console.log('Pawn found:', JSON.stringify(pawn, null, 2));
 
-        // รวมข้อมูล Pawn และ Gold
-        const pawnWithGold = { 
-            ...pawn.toObject(), 
-            goldItems: goldItems 
+        // ค้นหา Customer โดยใช้ customerId แทน _id
+        const customer = await Customer.findOne({ customerId: pawn.customerId });
+
+        if (!customer) {
+            console.log('Customer not found');
+            return res.status(404).render('error', { message: 'ไม่พบข้อมูลลูกค้า' });
+        }
+
+        // ค้นหาข้อมูล Gold
+        const goldItems = await Pawn.find({ goldId: { $in: pawn.goldId } }).populate('typeName');
+        console.log('Gold items found:', JSON.stringify(goldItems, null, 2));
+
+        const pawnWithGold = {
+            ...pawn.toObject(),
+            goldItems: goldItems,
+            customer: customer // เพิ่มข้อมูลลูกค้าเข้าไปใน object
         };
 
         res.render('pawnlist', { pawn: pawnWithGold });
     } catch (error) {
-        console.error('Error fetching pawn details:', error);
-        res.status(500).render('error', { message: 'เกิดข้อผิดพลาดในการดึงข้อมูลจำนำ' });
+        console.error('Detailed error:', error);
+        res.status(500).render('error', { message: 'เกิดข้อผิดพลาดในการดึงข้อมูลจำนำ: ' + error.message });
     }
 });
 
