@@ -23,17 +23,18 @@ async function generatePaymentId() {
     const newPaymentId = lastId + 1;
     return `PM-${String(newPaymentId).padStart(4, '0')}`;
 }
-// async function generatePawnId() {
-//     const lastPawn = await addPawn.findOne().sort({ createdAt: -1 });
-//     if (!lastPawn) return 'P-0001';
-//     const lastId = parseInt(lastPawn.pawnId.split('-')[1]);
-//     const newPawnId = lastId + 1;
-//     return `P-${String(newPawnId).padStart(4, '0')}`;
-// }
+// ฟังก์ชันสำหรับรับวันที่ปัจจุบันในรูปแบบ YYYY-MM-DD
+function getCurrentDate() {
+    const today = new Date();
+    const offset = today.getTimezoneOffset() * 60000;
+    const localToday = new Date(today.getTime() - offset);
+    return localToday.toISOString().split('T')[0];
+}
 
 // เส้นทางเพื่อแสดงหน้า Add Gold Pawn สำหรับลูกค้า
 router.get('/addpawn/:customerId', async (req, res) => {
     const { customerId } = req.params;
+    const currentDate = getCurrentDate();
     try {
         // ดึงข้อมูลลูกค้าตาม customerId
         const customer = await Customer.findOne({ customerId: customerId });
@@ -72,7 +73,7 @@ router.get('/addpawn/:customerId', async (req, res) => {
         const newPID = await generatePawnId();
 
         // ส่งข้อมูลลูกค้า, ประวัติการจำนำทอง, และ customerId ไปยังหน้า addpawn.ejs
-        res.render('addpawn', { customer, pawns, customerId: customer.customerId, newGoldId, newPID, typeList});
+        res.render('addpawn', { customer, pawns, customerId: customer.customerId, newGoldId, newPID, typeList, startDate: currentDate});
     } catch (error) {
         console.error('Error fetching customer or pawn history:', error);
         res.status(500).render('error', { message: 'เกิดข้อผิดพลาดในการดึงข้อมูล' });
@@ -85,8 +86,10 @@ router.post('/addpawn/:customerId', async (req, res) => {
     console.log('Request body:', req.body);
     console.log('Request params:', req.params);
     const { customerId } = req.params;
-    const { pawnId, typeName, weight, principal, interest, intperm } = req.body;
+    const { pawnId, typeName, weight, principal, interest, intperm, startDate, nextDueDate } = req.body;
     
+    console.log('Received startDate:', startDate);
+    console.log('Received nextDueDate:', nextDueDate);
     try {
         const customer = await Customer.findOne({ customerId: customerId });
         if (!customer) {
@@ -140,6 +143,33 @@ router.post('/addpawn/:customerId', async (req, res) => {
 
         // ดึงข้อมูล Gold ที่มี typeName populated
         // const populatedGold = await Pawn.findById(newGold._id).typeName;
+        // ตรวจสอบและแปลงค่าวันที่
+        const startDateObj = new Date(startDate);
+        let nextDueDateObj = new Date(nextDueDate);
+
+        if (isNaN(startDateObj.getTime())) {
+            throw new Error('วันที่เริ่มต้นไม่ถูกต้อง');
+        }
+
+        if (isNaN(nextDueDateObj.getTime())) {
+            throw new Error('วันที่ครบกำหนดไม่ถูกต้อง');
+        }
+
+        if (nextDueDateObj <= startDateObj) {
+            throw new Error('วันที่ครบกำหนดต้องมาหลังวันที่เริ่มต้น');
+        }
+        // สร้างรายการชำระเงินใหม่
+        const newPayment = new Payment({
+            paymentId: newPaymentId,
+            paymentDate: new Date(), // วันที่ทำรายการปัจจุบัน
+            startDate: startDateObj,
+            nextDueDate: nextDueDateObj,
+            amount: principal,
+            statusPawn: 'เริ่มจำนำ',
+            goldId: newGoldId
+        });
+        await newPayment.save();
+        console.log('Payment created:', newPayment);
 
         console.log(existingPawn)
         console.log(newGold)
@@ -150,6 +180,7 @@ router.post('/addpawn/:customerId', async (req, res) => {
             message: 'เพิ่มข้อมูลทองที่จำนำเรียบร้อย', 
             pawn: existingPawn,
             gold: newGold,
+            payment: newPayment,
             newPawnId: newPawnId,
             newGoldId: newGoldId
         });

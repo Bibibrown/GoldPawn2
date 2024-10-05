@@ -20,7 +20,7 @@ const paymentSchema = new Schema({
     },
     nextDueDate: {
         type: Date,
-        required: true
+
     },
     amount: {
         type: Number,

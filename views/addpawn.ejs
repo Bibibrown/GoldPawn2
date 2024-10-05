@@ -147,6 +147,17 @@
                                 </div>
                             </div>
                         </div>
+
+                        <div class="mb-3 row">
+                            <label for="startDate" class="col-sm-2 col-form-label">วันที่จำนำ</label>
+                            <div class="col-sm-4">
+                                <input type="date" class="form-control" id="startDate" name="startDate" required readonly>
+                            </div>
+                            <label for="nextDueDate" class="col-sm-2 col-form-label">วันที่ครบกำหนด</label>
+                            <div class="col-sm-4">
+                                <input type="date" class="form-control" id="nextDueDate" name="nextDueDate" required>
+                            </div>
+                        </div>
                         <div class="d-flex justify-content-end">
                             <button type="reset" class="btn btn-secondary me-2">ล้าง</button>
                             <button type="submit" class="btn btn-success">ยืนยัน</button>
@@ -245,49 +256,66 @@
                 const formattedGoldId = currentGoldId.toString().padStart(4, '0');
                 document.getElementById('goldId').value = `G-${formattedGoldId}`;
             }
+            document.addEventListener('DOMContentLoaded', function() {
+                // ตั้งค่าวันที่จำนำเป็นวันที่ปัจจุบันตามเวลาประเทศไทย
+                function setCurrentDate() {
+                    const today = new Date();
+                    const offset = today.getTimezoneOffset() * 60000;
+                    const localToday = new Date(today.getTime() - offset);
+                    const formattedDate = localToday.toISOString().split('T')[0];
+                    document.getElementById('startDate').value = formattedDate;
+                }
 
-            document.getElementById('goldPawnForm').addEventListener('submit', function(event) {
-                event.preventDefault();
-                
-                const formData = new FormData(this);
-                const customerId = formData.get('customerId');
-                const data = Object.fromEntries(formData);
+                // เรียกใช้ฟังก์ชันเมื่อโหลดหน้า
+                setCurrentDate();
 
-                fetch(`/pawn/addpawn/${customerId}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(data)
-                }).then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok');
-                    }
-                    return response.json();
-                }).then(data => {
-                    console.log(data);
-                    alert(data.message);
+                document.getElementById('goldPawnForm').addEventListener('submit', function(event) {
+                    event.preventDefault();
                     
-                    // เพิ่มข้อมูลใหม่ลงในตาราง
-                    addNewRowToPawnHistoryTable(data.gold);
+                    const formData = new FormData(this);
+                    const customerId = formData.get('customerId');
+                    const data = Object.fromEntries(formData);
 
-                    // ล้างข้อมูลในฟอร์มยกเว้น customerId, customerFName, customerLName, และ pawnId
-                    const customerId = this.customerId.value;
-                    const customerFName = this.customerFName.value;
-                    const customerLName = this.customerLName.value;
-                    const pawnId = this.pawnId.value;
-                    this.reset();
-                    this.customerId.value = customerId;
-                    this.customerFName.value = customerFName;
-                    this.customerLName.value = customerLName;
-                    this.pawnId.value = pawnId;
+                    fetch(`/pawn/addpawn/${customerId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify(data)
+                    }).then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    }).then(data => {
+                        console.log(data);
+                        alert(data.message);
+                        
+                        // เพิ่มข้อมูลใหม่ลงในตาราง
+                        addNewRowToPawnHistoryTable(data.gold);
 
-                    // อัปเดต goldId ใหม่
-                    updateGoldId();
+                        // ล้างข้อมูลในฟอร์มยกเว้น customerId, customerFName, customerLName, และ pawnId
+                        const customerId = this.customerId.value;
+                        const customerFName = this.customerFName.value;
+                        const customerLName = this.customerLName.value;
+                        const pawnId = this.pawnId.value;
+                        
+                        this.reset();
+                        this.customerId.value = customerId;
+                        this.customerFName.value = customerFName;
+                        this.customerLName.value = customerLName;
+                        this.pawnId.value = pawnId;
 
-                }).catch(error => {
-                    console.error('Error:', error);
-                    alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
+                        // ตั้งค่าวันที่เริ่มต้นใหม่
+                        setCurrentDate();
+
+                        // อัปเดต goldId ใหม่
+                        updateGoldId();
+
+                    }).catch(error => {
+                        console.error('Error:', error);
+                        alert('เกิดข้อผิดพลาดในการบันทึกข้อมูล');
+                    });
                 });
             });
 
