@@ -16,13 +16,20 @@ async function generateGoldId() {
     return `G-${String(newGoldId).padStart(4, '0')}`;
 }
 
-async function generatePawnId() {
-    const lastPawn = await addPawn.findOne().sort({ createdAt: -1 });
-    if (!lastPawn) return 'P-0001';
-    const lastId = parseInt(lastPawn.pawnId.split('-')[1]);
-    const newPawnId = lastId + 1;
-    return `P-${String(newPawnId).padStart(4, '0')}`;
+async function generatePaymentId() {
+    const lastPayment = await Payment.findOne().sort({ createdAt: -1 });
+    if (!lastPayment) return 'PM-0001';
+    const lastId = parseInt(lastPayment.paymentId.split('-')[1]);
+    const newPaymentId = lastId + 1;
+    return `PM-${String(newPaymentId).padStart(4, '0')}`;
 }
+// async function generatePawnId() {
+//     const lastPawn = await addPawn.findOne().sort({ createdAt: -1 });
+//     if (!lastPawn) return 'P-0001';
+//     const lastId = parseInt(lastPawn.pawnId.split('-')[1]);
+//     const newPawnId = lastId + 1;
+//     return `P-${String(newPawnId).padStart(4, '0')}`;
+// }
 
 // เส้นทางเพื่อแสดงหน้า Add Gold Pawn สำหรับลูกค้า
 router.get('/addpawn/:customerId', async (req, res) => {
@@ -104,6 +111,8 @@ router.post('/addpawn/:customerId', async (req, res) => {
 
         const type = await Type.findById(typeName);
 
+        const newPaymentId = await generatePaymentId();
+
         const newGold = new Pawn({
             pawnId: newPawnId,
             goldId: newGoldId,
@@ -113,7 +122,7 @@ router.post('/addpawn/:customerId', async (req, res) => {
             interest: interest,
             intperm: intperm,
             status: 'จำนำ',
-            paymentId: []
+            paymentId: [newPaymentId]
         });
 
         await newGold.save();

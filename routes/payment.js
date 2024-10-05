@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Payment = require('../models/payment');
 const Pawn = require('../models/goldPawn');
+const Customer = require('../models/customer');
 
 router.get('/', async (req, res) => {
     res.render('golddetail');
@@ -11,10 +12,19 @@ router.get('/gold-payment-history/:goldId', async (req, res) => {
     console.log('Accessing gold-payment-history route');
     console.log('GoldId:', req.params.goldId);
     try {
+        // const { customerId } = req.body;
+        // ดึงข้อมูลลูกค้าตาม customerId
+        // const customer = await Customer.findOne({ customerId: customerId });
+        // if (!customer) {
+        //     // return res.status(404).send('ไม่พบลูกค้า');
+        //     return res.status(404).render('error', { message: 'ไม่พบลูกค้า' });
+        // }
+
         const { goldId } = req.params;
         
         // ดึงข้อมูลทองโดยใช้ goldId แทน _id
-        const gold = await Pawn.findOne({ goldId }).populate('typeName');
+        const gold = await Pawn.findOne({ goldId: goldId });
+        // const gold = await Customer.findOne({ customerId: customerId });
         if (!gold) {
             console.log('Gold not found');
             return res.status(404).render('error', { message: 'ไม่พบข้อมูลทอง' });
