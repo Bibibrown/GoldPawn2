@@ -144,27 +144,34 @@ router.post('/addpawn/:customerId', async (req, res) => {
     }
 });
 
-router.get('/getNewIds/:customerId', async (req, res) => {
-    const { customerId } = req.params;
-    // สร้างลอจิกสำหรับการสร้าง ID ใหม่
-    const newPID = 'P-' + (Math.floor(Math.random() * 10000)).toString().padStart(4, '0');
-    const newGoldId = 'G-' + (Math.floor(Math.random() * 10000)).toString().padStart(4, '0');
-    res.json({ newPID, newGoldId });
-});
-
-router.get('/history/:customerId', async (req, res) => {
-    const { customerId } = req.params;
+// เพิ่ม route ใหม่สำหรับดูรายละเอียดการจำนำ
+router.get('/:pawnId', async (req, res) => {
     try {
-        const pawns = await addPawn.find({ customerId })
-            .populate({
-                path: 'goldId',
-                populate: { path: 'typeName' }
-            })
-            .sort({ createdAt: -1 });
-        res.json(pawns);
+        const { pawnId } = req.params;
+        
+        // ค้นหาข้อมูลการจำนำจาก pawnId
+        const pawn = await addPawn.findOne({ pawnId });
+        
+        if (!pawn) {
+            return res.status(404).render('error', { message: 'ไม่พบข้อมูลการจำนำ' });
+        }
+
+        // ค้นหาข้อมูลลูกค้าจาก customerId
+        const customer = await Customer.findOne({ customerId: pawn.customerId });
+
+        if (!customer) {
+            return res.status(404).render('error', { message: 'ไม่พบข้อมูลลูกค้า' });
+        }
+
+        // ค้นหาข้อมูลทองที่เกี่ยวข้องกับการจำนำนี้
+        const golds = await Pawn.find({ goldId: { $in: pawn.goldId } }).populate('typeName');
+
+        // ส่งข้อมูลไปแสดงในหน้า EJS
+        res.render('pawnlist', { pawn, customer, golds });
+
     } catch (error) {
-        console.error('Error fetching pawn history:', error);
-        res.status(500).json({ error: 'เกิดข้อผิดพลาดในการดึงประวัติการจำนำ' });
+        console.error('Error fetching pawn details:', error);
+        res.status(500).render('error', { message: 'เกิดข้อผิดพลาดในการดึงข้อมูลการจำนำ' });
     }
 });
 
