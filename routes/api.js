@@ -31,8 +31,6 @@ async function generateGoldId() {
     return `G-${String(newGoldId).padStart(4, '0')}`;
 }
 
-// -------------------------------------------------------------
-
 // GET: ดึงข้อมูลลูกค้าทั้งหมด
 router.get('/customers', async (req, res) => {
     try {
@@ -121,8 +119,6 @@ router.delete('/customers/:customerId', async (req, res) => {
     }
 });
 
-// -------------------------------------------------------------
-
 // GET: ดึงข้อมูลpawnทั้งหมด
 router.get('/pawns', async (req, res) => {
     try {
@@ -146,20 +142,20 @@ router.get('/pawns/:pawnId', async (req, res) => {
 });
 
 // POST: เพิ่มpawnใหม่
-// router.post('/pawns', async (req, res) => {
-//     try {
-//         const newPawn = new addPawn({
-//             pawnId: await generatePawnId(),
-//             customerId: req.body.customerId,
-//             goldId: req.body.goldId || [] 
-//         });
-//         await newPawn.save();
-//         res.status(201).json(newPawn);
-//     } catch (error) {
-//         console.error(error); 
-//         res.status(500).json({ message: 'เกิดข้อผิดพลาดในการเพิ่มข้อมูลการจำนำ', error });
-//     }
-// });
+router.post('/pawns', async (req, res) => {
+    try {
+        const newPawn = new addPawn({
+            pawnId: await generatePawnId(),
+            customerId: req.body.customerId,
+            goldId: req.body.goldId || [] 
+        });
+        await newPawn.save();
+        res.status(201).json(newPawn);
+    } catch (error) {
+        console.error(error); 
+        res.status(500).json({ message: 'เกิดข้อผิดพลาดในการเพิ่มข้อมูลการจำนำ', error });
+    }
+});
 
 // PUT: แก้ไขข้อมูลpawn
 router.put('/pawns/:pawnId', async (req, res) => {
@@ -201,8 +197,6 @@ router.delete('/pawns/:pawnId', async (req, res) => {
     }
 });
 
-// -------------------------------------------------------------
-
 // GET: ดึงข้อมูลgoldทั้งหมด
 router.get('/golds', async (req, res) => {
     try {
@@ -224,28 +218,6 @@ router.get('/golds/:goldId', async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 });
-
-// POST: เพิ่มgoldใหม่
-// router.post('/golds', async (req, res) => {
-//     try {
-//         const newGold = new Pawn({
-//             pawnId: req.body.pawnId,
-//             goldId: await generateGoldId(), // สร้าง typeId ใหม่
-//             typeName: req.body.typeName,
-//             weight: req.body.weight,
-//             principal: req.body.principle,
-//             interest: req.body.interest,
-//             intperm: req.body.intperm,
-//             status: 'จำนำ',
-//             paymentId: req.body.paymentId || [] 
-//         });
-//         await newGold.save();
-//         res.status(201).json(newGold);
-//     } catch (error) {
-//         console.error(error); // log ข้อผิดพลาดใน console
-//         res.status(500).json({ message: 'เกิดข้อผิดพลาดในการเพิ่มข้อมูลทอง', error });
-//     }
-// });
 
 // PUT: แก้ไขข้อมูลgold
 router.put('/golds/:goldId', async (req, res) => {
@@ -286,8 +258,6 @@ router.delete('/golds/:goldId', async (req, res) => {
         res.status(500).json({ message: 'เกิดข้อผิดพลาดในการลบทอง', error });
     }
 });
-
-// -------------------------------------------------------------
 
 // GET: ดึงข้อมูลtypeทั้งหมด
 router.get('/types', async (req, res) => {

@@ -10,7 +10,7 @@ const goldSchema = new Schema({
     goldId: {
         type: String,
         required: true,
-        unique: true, // กำหนดให้ไม่ซ้ำกัน
+        unique: true, 
     },
     typeName: {
         type: String,
@@ -20,27 +20,27 @@ const goldSchema = new Schema({
     weight: {
         type: Number,
         required: true,
-        min: 0.01, // กำหนดค่าน้ำหนักขั้นต่ำ
+        min: 0.01, 
     },
     principal: {
         type: Number,
         required: true,
-        min: 0, // กำหนดเงินต้นขั้นต่ำ
+        min: 0, 
     },
     interest: {
         type: Number,
         required: true,
-        min: 0, // กำหนดดอกเบี้ยขั้นต่ำ
+        min: 0, 
     },
     intperm: {
         type: Number,
         required: true,
-        min: 0, // กำหนดเงินสุทธิขั้นต่ำ
+        min: 0, 
     },
     status: {
         type: String,
         default:'จำนำ',
-        enum: ['จำนำ', 'หลุดจำนำ', 'ไถ่คืน'], // กำหนดสถานะที่อนุญาต
+        enum: ['จำนำ', 'หลุดจำนำ', 'ไถ่คืน'], 
     },
     paymentId: {
         type: [String], 

@@ -11,6 +11,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@200;300;400;500;600;700&display=swap"
         rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         * {
             font-family: "Mitr", sans-serif;
@@ -175,12 +176,25 @@
         })
             .then(response => {
                 if (!response.ok) throw new Error('เกิดข้อผิดพลาดในการเพิ่มข้อมูลลูกค้า');
-                alert('เพิ่มข้อมูลลูกค้าเรียบร้อย');
-                // ล้างฟอร์ม
-                customerForm.reset();
+                Swal.fire({
+                    icon: 'success',
+                    title: 'สำเร็จ!',
+                    text: 'เพิ่มข้อมูลลูกค้าเรียบร้อย',
+                    confirmButtonText: 'ตกลง'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // ล้างฟอร์ม
+                        customerForm.reset();
+                    }
+                });
             })
-            .catch((error) => {
-                console.error('Error:', error);
+            .catch(error => {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'เกิดข้อผิดพลาด!',
+                    text: error.message,
+                    confirmButtonText: 'ตกลง'
+                });
             });
     });
 
@@ -268,21 +282,41 @@
 
     // ฟังก์ชันสำหรับลบประเภททอง
     async function deleteGoldType(typeId) {
-        if (confirm('คุณต้องการลบประเภททองนี้หรือไม่?')) {
+        const result = await Swal.fire({
+            title: 'คุณแน่ใจหรือไม่?',
+            text: "คุณต้องการลบประเภททองนี้หรือไม่?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'ใช่, ลบเลย!',
+            cancelButtonText: 'ยกเลิก'
+        });
+
+        if (result.isConfirmed) {
             try {
                 const response = await fetch(`/add-data/types/${typeId}`, {
                     method: 'DELETE',
                 });
 
                 if (response.ok) {
-                    alert('ลบประเภททองสำเร็จ');
+                    await Swal.fire(
+                        'ลบแล้ว!',
+                        'ลบประเภททองสำเร็จ',
+                        'success'
+                    );
                     loadGoldTypes(); // โหลดข้อมูลใหม่หลังจากลบสำเร็จ
                     fetchLatestTypeId(); // ดึง typeId ล่าสุดหลังจากลบประเภททอง
                 } else {
-                    alert('เกิดข้อผิดพลาดในการลบประเภททอง');
+                    throw new Error('เกิดข้อผิดพลาดในการลบประเภททอง');
                 }
             } catch (error) {
                 console.error('Error deleting gold type:', error);
+                await Swal.fire(
+                    'เกิดข้อผิดพลาด!',
+                    error.message,
+                    'error'
+                );
             }
         }
     }

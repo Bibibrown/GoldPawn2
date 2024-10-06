@@ -10,6 +10,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         *{
             font-family: "Mitr", sans-serif;
@@ -61,7 +62,7 @@
                             <td><%= gold.principal.toLocaleString('th-TH') %></td>
                             <td><%= gold.intperm.toLocaleString('th-TH') %></td>
                             <td><%= payment.totalPayment.toLocaleString('th-TH') %></td>
-                            <td><%= payment.statusPawn %></td>
+                            <td class="gold-status" data-gold-id="<%= gold._id %>"><%= gold.status %></td>
                         </tr>
                     <% }); %>
                 <% } %>
@@ -174,8 +175,7 @@
     <footer class="mt-5"></footer>
 
     <script>   
-        // เก็บระยะเวลาระหว่าง nextDueDate และ startDate แรก
-        let goldId; // Add this line to store goldId at a higher scope
+        let goldId = '<%= gold._id %>'; 
 
         document.addEventListener('DOMContentLoaded', function() {
             const extendPaymentModal = document.getElementById('extendPaymentModal');
@@ -183,6 +183,71 @@
             const confirmExtendButton = document.getElementById('confirmExtend');
             let initialDuration;
 
+                   // เพิ่มฟังก์ชันใหม่นี้เพื่อตรวจสอบและอัปเดตสถานะทอง
+            function checkAndUpdateGoldStatus() {
+                console.log('เริ่มตรวจสอบสถานะทอง, goldId:', goldId);
+                if (!goldId) {
+                    console.error('goldId เป็นค่า null หรือ undefined');
+                    return;
+                }
+
+                fetch(`/payment/check-status/${goldId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('ผลลัพธ์การตรวจสอบสถานะ:', data);
+                        if (data.success) {
+                            updateGoldInfo(data);
+                            if (data.statusChanged) {
+                                console.log('สถานะเปลี่ยนแปลง, อัปเดตหน้า');
+                                handleStatusChange(data.currentStatus, data.lastPaymentDate, data.nextDueDate);
+                            } else {
+                                console.log('ไม่มีการเปลี่ยนแปลงสถานะ');
+                            }
+                        } else {
+                            console.error('ไม่สามารถตรวจสอบสถานะทองได้:', data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('เกิดข้อผิดพลาดในการตรวจสอบสถานะทอง:', error);
+                    });
+            }
+
+            function updateGoldInfo(data) {
+                // อัปเดตข้อมูลทองในหน้าเว็บ
+                document.getElementById('pawnId').textContent = data.pawnId;
+                document.getElementById('typeName').textContent = data.typeName;
+                document.getElementById('weight').textContent = data.weight;
+                document.getElementById('principal').textContent = data.principal.toLocaleString('th-TH');
+                document.getElementById('interest').textContent = data.interest;
+                document.getElementById('intperm').textContent = data.intperm.toLocaleString('th-TH');
+                document.getElementById('status').textContent = data.currentStatus;
+
+                // อัปเดตข้อมูลการชำระเงินล่าสุด
+                document.getElementById('lastPaymentDate').textContent = new Date(data.lastPaymentDate).toLocaleDateString('th-TH');
+                document.getElementById('nextDueDate').textContent = new Date(data.nextDueDate).toLocaleDateString('th-TH');
+            }
+
+            function handleStatusChange(newStatus, lastPaymentDate, nextDueDate) {
+                console.log('กำลังจัดการการเปลี่ยนแปลงสถานะเป็น:', newStatus);
+                
+                if (newStatus === 'หลุดจำนำ') {
+                    // ซ่อนปุ่มหรือฟอร์มที่เกี่ยวข้องกับการชำระเงิน
+                    const paymentElements = document.getElementsByClassName('payment-related');
+                    for (let element of paymentElements) {
+                        element.style.display = 'none';
+                    }
+
+                    // แสดง alert
+                    const lastPaymentDateThai = new Date(lastPaymentDate).toLocaleDateString('th-TH');
+                    const nextDueDateThai = new Date(nextDueDate).toLocaleDateString('th-TH');
+                    alert(`ทองได้หลุดจำนำแล้ว\nวันที่ชำระครั้งสุดท้าย: ${lastPaymentDateThai}\nวันครบกำหนดชำระล่าสุด: ${nextDueDateThai}`);
+                }
+
+                console.log('จัดการการเปลี่ยนแปลงสถานะเสร็จสิ้น');
+            }
+
+            // เรียกใช้ฟังก์ชันเมื่อโหลดหน้า
+            document.addEventListener('DOMContentLoaded', checkAndUpdateGoldStatus);
             // เมื่อ modal เปิด
             extendPaymentModal.addEventListener('show.bs.modal', function(event) {
                 const button = event.relatedTarget;
@@ -289,15 +354,33 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        alert('ต่อดอกเรียบร้อยแล้ว');
-                        location.reload();
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'สำเร็จ!',
+                            text: 'ต่อดอกเรียบร้อยแล้ว',
+                            confirmButtonText: 'ตกลง'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                location.reload();
+                            }
+                        });
                     } else {
-                        alert('เกิดข้อผิดพลาด: ' + data.message);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'เกิดข้อผิดพลาด',
+                            text: data.message,
+                            confirmButtonText: 'ตกลง'
+                        });
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    alert('เกิดข้อผิดพลาดในการต่อดอก');
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'เกิดข้อผิดพลาด',
+                        text: 'เกิดข้อผิดพลาดในการต่อดอก',
+                        confirmButtonText: 'ตกลง'
+                    });
                 });
             });
         });

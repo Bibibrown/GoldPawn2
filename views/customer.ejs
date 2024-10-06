@@ -11,6 +11,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@200;300;400;500;600;700&display=swap"
         rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> 
     <style>
         * {
             font-family: "Mitr", sans-serif;
@@ -137,11 +138,17 @@
                         return response.json();
                     })
                     .then(data => {
-                        alert('แก้ไขข้อมูลลูกค้าเรียบร้อย');
-                        setFormReadonly(true);  // ล็อกฟอร์มอีกครั้งหลังจากแก้ไข
-                        document.getElementById('editButton').style.display = 'inline-block'; // แสดงปุ่มแก้ไข
-                        document.getElementById('confirmButton').style.display = 'none'; // ซ่อนปุ่มยืนยัน
-                        document.getElementById('addGoldButton').style.display = 'inline-block'; // แสดงปุ่มเพิ่มข้อมูลจำนำทอง
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'สำเร็จ!',
+                            text: 'แก้ไขข้อมูลลูกค้าเรียบร้อย',
+                            confirmButtonText: 'ตกลง'
+                        }).then(() => {
+                            setFormReadonly(true);  // ล็อกฟอร์มอีกครั้งหลังจากแก้ไข
+                            document.getElementById('editButton').style.display = 'inline-block'; // แสดงปุ่มแก้ไข
+                            document.getElementById('confirmButton').style.display = 'none'; // ซ่อนปุ่มยืนยัน
+                            document.getElementById('addGoldButton').style.display = 'inline-block'; // แสดงปุ่มเพิ่มข้อมูลจำนำทอง
+                        });
                     })
                     .catch(err => {
                         alert(err.message);

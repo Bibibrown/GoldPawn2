@@ -29,7 +29,7 @@ const paymentSchema = new Schema({
     statusPawn: {
         type: String,
         default:'เริ่มจำนำ',
-        enum: ['เริ่มจำนำ', 'ต่อดอก', 'ไถ่คืน'], // กำหนดสถานะที่อนุญาต
+        enum: ['เริ่มจำนำ', 'ต่อดอก', 'ไถ่คืน'], 
     },
     goldId: {
         type: String,

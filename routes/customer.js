@@ -1,34 +1,31 @@
 const mongoose = require('mongoose');
 const express = require('express');
 const router = express.Router();
-const Customer = require('../models/customer'); // อ้างอิงโมเดล Customer
+const Customer = require('../models/customer'); 
 const Pawn = require('../models/pawn');
+const Gold = require('../models/goldPawn');
+const Payment = require('../models/payment');
 
 // Middleware สำหรับตรวจสอบข้อมูลลูกค้า
 function validateCustomerData(req, res, next) {
     const { customerId, customerFName, customerLName, customerAddress, customerPhone } = req.body;
 
-    // ตรวจสอบว่าข้อมูลครบถ้วน
     if (!customerId || !customerFName || !customerLName || !customerAddress || !customerPhone) {
         return res.status(400).json({ message: 'กรุณากรอกข้อมูลลูกค้าทั้งหมด' });
     }
 
-    // ตรวจสอบว่า customerId เป็นเลข
     if (isNaN(customerId)) {
         return res.status(400).json({ message: 'ID ลูกค้าต้องเป็นตัวเลข 13 หลัก' });
     }
-
     // ตรวจสอบความยาวของชื่อและนามสกุล
     if (customerFName.length < 2 || customerLName.length < 2) {
         return res.status(400).json({ message: 'ชื่อและนามสกุลต้องมีความยาวอย่างน้อย 2 ตัวอักษร' });
     }
-
     // ตรวจสอบรูปแบบเบอร์โทร (ต้องมี 10 หลัก)
     const phonePattern = /^\d{10}$/;
     if (!phonePattern.test(customerPhone)) {
         return res.status(400).json({ message: 'เบอร์โทรต้องเป็นตัวเลข 10 หลัก' });
     }
-
     next();
 }
 
@@ -46,7 +43,7 @@ router.get('/:customerId', async (req, res) => {
         if (!customer) {
             return res.status(404).json({ message: 'ไม่พบข้อมูลลูกค้า' });
         }
-        res.render('customer', { customer, customerId }); // ส่งข้อมูลลูกค้าไปยัง view
+        res.render('customer', { customer, customerId }); 
     } catch (error) {
         console.error('Error fetching customer:', error);
         res.status(500).json({ message: 'เกิดข้อผิดพลาดในการค้นหาข้อมูลลูกค้า' });
@@ -71,7 +68,7 @@ router.put('/:customerId', validateCustomerData, async (req, res) => {
 
         res.json(updatedCustomer);
     } catch (error) {
-        console.error('Update Error:', error); // Log the error
+        console.error('Update Error:', error); 
         res.status(500).json({ message: 'เกิดข้อผิดพลาดในการอัปเดตข้อมูลลูกค้า' });
     }
 });
@@ -102,7 +99,7 @@ router.post('/', validateCustomerData, async (req, res) => {
         });
 
         await newCustomer.save();
-        res.status(201).redirect(`/customer/${newCustomer.customerId}`); // เปลี่ยนไปที่หน้าแสดงข้อมูลลูกค้า
+        res.status(201).redirect(`/customer/${newCustomer.customerId}`); 
     } catch (error) {
         console.error('Create Customer Error:', error);
         res.status(500).json({ message: 'เกิดข้อผิดพลาดในการเพิ่มข้อมูลลูกค้า' });
@@ -113,22 +110,70 @@ router.post('/', validateCustomerData, async (req, res) => {
 router.delete('/:customerId', async (req, res) => {
     try {
         const { customerId } = req.params;
+        let deletedPawns = 0;
+        let deletedGolds = 0;
+        let deletedPayments = 0;
 
         // ค้นหาการจำนำที่เกี่ยวข้อง
         const pawns = await Pawn.find({ customerId: customerId });
 
-        // ลบการจำนำที่พบ
         if (pawns.length > 0) {
-            await Pawn.deleteMany({ customerId: customerId });
+            deletedPawns = pawns.length;
+            // ใช้ทั้ง _id และ pawnId ในการค้นหา Gold
+            const pawnIds = pawns.map(pawn => pawn._id.toString());
+            const pawnNumbers = pawns.map(pawn => pawn.pawnId);
+            
+            console.log('Pawn IDs:', pawnIds);
+            console.log('Pawn Numbers:', pawnNumbers);
+
+            // ตรวจสอบ Gold ที่เกี่ยวข้องโดยใช้ทั้ง _id และ pawnId
+            const relatedGolds = await Gold.find({ 
+                $or: [
+                    { pawnId: { $in: pawnIds } },
+                    { pawnId: { $in: pawnNumbers } }
+                ]
+            });
+            console.log(`Found ${relatedGolds.length} related gold records`);
+            deletedGolds = relatedGolds.length;
+
+            // รวบรวม goldIds ทั้งหมด
+            const goldIds = relatedGolds.map(gold => gold.goldId);
+
+            // ลบข้อมูล Payment ที่เกี่ยวข้องกับ Gold
+            const deletePaymentResult = await Payment.deleteMany({ goldId: { $in: goldIds } });
+            deletedPayments = deletePaymentResult.deletedCount;
+            console.log(`Deleted ${deletedPayments} payment records`);
+
+            // ลบข้อมูลทองคำที่เกี่ยวข้องกับ pawn ทั้งหมด
+            const deleteGoldResult = await Gold.deleteMany({ 
+                $or: [
+                    { pawnId: { $in: pawnIds } },
+                    { pawnId: { $in: pawnNumbers } }
+                ]
+            });
+            console.log(`Deleted ${deleteGoldResult.deletedCount} gold records`);
+            
+            // ลบการจำนำทั้งหมดของลูกค้า
+            const deletePawnResult = await Pawn.deleteMany({ customerId: customerId });
+            console.log(`Deleted ${deletePawnResult.deletedCount} pawn records`);
         }
 
         // ลบลูกค้า
-        await Customer.deleteOne({ customerId: customerId });
+        const deleteCustomerResult = await Customer.findOneAndDelete({ customerId: customerId });
+        if (!deleteCustomerResult) {
+            return res.status(404).json({ message: 'Customer not found' });
+        }
 
-        res.status(200).json({ message: 'Customer and related pawns deleted successfully' });
+        res.status(200).json({ 
+            message: 'Customer, related pawns, golds, and payments deleted successfully',
+            deletedCustomer: deleteCustomerResult,
+            deletedPawns,
+            deletedGolds,
+            deletedPayments
+        });
     } catch (error) {
-        console.error('Error deleting customer and related pawns:', error);
-        res.status(500).json({ message: 'Error deleting customer and related pawns' });
+        console.error('Error deleting customer and related data:', error);
+        res.status(500).json({ message: 'Error deleting customer and related data', error: error.message });
     }
 });
 

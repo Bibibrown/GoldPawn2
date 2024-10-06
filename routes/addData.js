@@ -55,7 +55,7 @@ router.get('/latest-id', async (req, res) => {
         const newId = await generateTypeId(); // ใช้ฟังก์ชันสร้าง typeId ใหม่
         res.json({ typeId: newId }); // ส่ง typeId ล่าสุด
     } catch (error) {
-        console.error(error); // log ข้อผิดพลาดใน console
+        console.error(error); 
         res.status(500).json({ message: 'เกิดข้อผิดพลาดในการดึง typeId ล่าสุด', error });
     }
 });
