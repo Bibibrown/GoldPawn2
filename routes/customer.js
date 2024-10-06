@@ -29,13 +29,13 @@ function validateCustomerData(req, res, next) {
     next();
 }
 
-// GET หน้าเพิ่มลูกค้าใหม่
+// GET หน้าเพิ่มลูกค้าใหม่ กรณีไม่มีข้อมูล
 router.get('/add-customer', (req, res) => {
     const customerID = req.query.customerID || ''; // รับ customerID จาก query parameter
     res.render('addcustomer', { customerID }); // ส่ง customerID ไปยัง view
 });
 
-// GET ลูกค้าตาม ID
+// GET ลูกค้าตาม ID กรณีมีข้อมูลอยู่แล้ว
 router.get('/:customerId', async (req, res) => {
     const { customerId } = req.params;
     try {
@@ -65,7 +65,6 @@ router.put('/:customerId', validateCustomerData, async (req, res) => {
         if (!updatedCustomer) {
             return res.status(404).json({ message: 'ไม่พบข้อมูลลูกค้าเพื่ออัปเดต' });
         }
-
         res.json(updatedCustomer);
     } catch (error) {
         console.error('Update Error:', error); 

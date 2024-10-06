@@ -10,9 +10,10 @@ router.get('/', (req, res) => {
 
 // GET หน้ารายชื่อลูกค้า
 router.get('/customer-list', async (req, res) => {
-    const searchQuery = req.query.search || '';
+    const searchQuery = req.query.search || ''; //รับข้อมูลช่องค้นหา
     try {
-        const customers = await Customer.find({
+        const customers = await Customer.find({ //ดึงข้อมูลcustomerขึ้นมา
+             //ตรวจสอบว่าค่าที่รับมาตรงกับข้อมูลไหนในฐานข้อมูล
             $or: [
                 { customerFName: new RegExp(searchQuery, 'i') },
                 { customerLName: new RegExp(searchQuery, 'i') },

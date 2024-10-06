@@ -48,6 +48,7 @@ router.get('/gold-payment-history/:goldId', async (req, res) => {
     }
 });
 
+//ดึงข้อมูลต่อดอก 
 router.get('/gold/:goldId', async (req, res) => {
     try {
         const { goldId } = req.params;
@@ -85,9 +86,11 @@ async function generatePaymentId() {
     return `PM-${String(newPaymentId).padStart(4, '0')}`;
 }
 
+//เพิ่มข้อมูลต่อดอก
 router.post('/extend-payment/:goldId', async (req, res) => {
     try {
         const { goldId } = req.params;
+        //ยอดที่ต้องชำระ
         const { amount } = req.body;
 
         // ดึงข้อมูล Gold
@@ -124,6 +127,7 @@ router.post('/extend-payment/:goldId', async (req, res) => {
         const startDate = new Date(lastPayment.startDate);
         const nextDueDate = new Date(lastPayment.nextDueDate);
 
+        //เช็ควันที่
         if (isNaN(startDate.getTime()) || isNaN(nextDueDate.getTime())) {
             return res.status(400).json({ 
                 success: false, 
@@ -138,8 +142,8 @@ router.post('/extend-payment/:goldId', async (req, res) => {
 
         // คำนวณวันที่สำหรับการต่อดอกใหม่
         const newStartDate = new Date(nextDueDate.getTime() + 24 * 60 * 60 * 1000); // nextDueDate + 1 วัน
-        const duration = nextDueDate.getTime() - startDate.getTime();
-        const newNextDueDate = new Date(newStartDate.getTime() + duration);
+        const duration = nextDueDate.getTime() - startDate.getTime(); //หาจำนวนวันทั้งหมดในรอบต่อดอก
+        const newNextDueDate = new Date(newStartDate.getTime() + duration); //กำหนดของรอบถัดไป
 
         console.log('New Start Date:', newStartDate);
         console.log('New Next Due Date:', newNextDueDate);
@@ -261,10 +265,10 @@ router.post('/redeem', async (req, res) => {
         // อัปเดต Gold document
         gold.status = 'ไถ่คืน';
         gold.paymentId = newPaymentId;
-        if (!gold.payments) {
-            gold.payments = [];
+        if (!gold.paymentId) {
+            gold.paymentId = [];
         }
-        gold.payments.push(newPayment._id);
+        gold.paymentId.push(newPayment._id);
 
         await gold.save();
 
@@ -275,6 +279,7 @@ router.post('/redeem', async (req, res) => {
     }
 });
 
+//เปลี่ยน status หลุดจำนำ
 router.get('/check-status/:goldId', async (req, res) => {
     try {
         const goldId = req.params.goldId;

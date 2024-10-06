@@ -54,7 +54,7 @@
                             <td><%= gold.principal.toLocaleString('th-TH') %></td>
                             <td><%= gold.intperm.toLocaleString('th-TH') %></td>
                             <td><%= payment.totalPayment.toLocaleString('th-TH') %></td>
-                            <td class="gold-status" data-gold-id="<%= gold._id %>"><%= gold.status %></td>
+                            <td><%= payment.statusPawn %></td>
                         </tr>
                     <% }); %>
                 <% } %>
@@ -240,7 +240,7 @@
 
             // เรียกใช้ฟังก์ชันเมื่อโหลดหน้า
             document.addEventListener('DOMContentLoaded', checkAndUpdateGoldStatus);
-            // เมื่อ modal เปิด
+            // เมื่อ modal เปิด ต่อดอก รับค่ามา
             extendPaymentModal.addEventListener('show.bs.modal', function(event) {
                 const button = event.relatedTarget;
                 goldId = button.getAttribute('data-payment-id');

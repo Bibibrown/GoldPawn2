@@ -16,6 +16,14 @@ async function generateGoldId() {
     return `G-${String(newGoldId).padStart(4, '0')}`;
 }
 
+async function generatePawnId() {
+    const lastPawn = await addPawn.findOne().sort({ createdAt: -1 }); // หาข้อมูลล่าสุด
+    if (!lastPawn) return 'P-0001'; 
+    const lastId = parseInt(lastPawn.pawnId.split('-')[1]); // แยกตัวเลขจาก typeId
+    const newPawnId = lastId + 1; 
+    return `P-${String(newPawnId).padStart(4, '0')}`; 
+}
+
 async function generatePaymentId() {
     const lastPayment = await Payment.findOne().sort({ createdAt: -1 });
     if (!lastPayment) return 'PM-0001';
@@ -50,23 +58,7 @@ router.get('/addpawn/:customerId', async (req, res) => {
         .sort({ createdAt: 1 });
 
         const typeList = await Type.find();
-
-        async function generateGoldId() {
-            const lastGold = await Pawn.findOne().sort({ createdAt: -1 }); // หาข้อมูลล่าสุด
-            if (!lastGold) return 'G-0001'; // ถ้าไม่มีข้อมูลเลย
-            const lastId = parseInt(lastGold.goldId.split('-')[1]); // แยกตัวเลขจาก typeId
-            const newGoldId = lastId + 1; // เพิ่ม ID ใหม่
-            return `G-${String(newGoldId).padStart(4, '0')}`; 
-        }
         const newGoldId = await generateGoldId();
-
-        async function generatePawnId() {
-            const lastPawn = await addPawn.findOne().sort({ createdAt: -1 }); // หาข้อมูลล่าสุด
-            if (!lastPawn) return 'P-0001'; 
-            const lastId = parseInt(lastPawn.pawnId.split('-')[1]); // แยกตัวเลขจาก typeId
-            const newPawnId = lastId + 1; 
-            return `P-${String(newPawnId).padStart(4, '0')}`; 
-        }
         const newPID = await generatePawnId();
 
         // ส่งข้อมูลลูกค้า, ประวัติการจำนำทอง, และ customerId ไปยังหน้า addpawn.ejs
@@ -108,9 +100,7 @@ router.post('/addpawn/:customerId', async (req, res) => {
         }
 
         const type = await Type.findById(typeName);
-
         const newPaymentId = await generatePaymentId();
-
         const newGold = new Pawn({
             pawnId: newPawnId,
             goldId: newGoldId,
@@ -212,8 +202,9 @@ router.get('/:pawnId', async (req, res) => {
             id: gold.goldId  // เพิ่ม field id ที่มีค่าเท่ากับ goldId
         }));
 
+        // แปลงเอกสารของ Mongoose เป็นอ็อบเจกต์ JavaScript
         res.render('pawnlist', { 
-            pawn: { ...pawn.toObject(), customer }, 
+            pawn: { ...pawn.toObject(), customer },  //แปลงpawn แล้วรวมcustomerไว้ในpawn
             golds: formattedGolds
         });
 
