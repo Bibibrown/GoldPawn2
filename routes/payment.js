@@ -283,4 +283,48 @@ router.post('/redeem', async (req, res) => {
     }
 });
 
+router.get('/check-status/:goldId', async (req, res) => {
+    try {
+        const goldId = req.params.goldId;
+        const gold = await Pawn.findOne({ goldId: goldId });
+        
+        if (!gold) {
+            return res.json({ success: false, message: 'ไม่พบทอง' });
+        }
+
+        const currentDate = new Date();
+        const latestPayment = await Payment.findOne({ goldId: goldId }).sort({ nextDueDate: -1 });
+
+        if (!latestPayment) {
+            return res.json({ success: true, statusChanged: false, currentStatus: gold.status });
+        }
+
+        const nextDueDate = new Date(latestPayment.nextDueDate);
+
+        let statusChanged = false;
+        if (currentDate > nextDueDate && gold.status !== 'หลุดจำนำ') {
+            gold.status = 'หลุดจำนำ';
+            await gold.save();
+            statusChanged = true;
+        }
+
+        return res.json({ 
+            success: true, 
+            statusChanged: statusChanged,
+            currentStatus: gold.status,
+            lastPaymentDate: latestPayment.paymentDate,
+            nextDueDate: latestPayment.nextDueDate,
+            pawnId: gold.pawnId,
+            typeName: gold.typeName,
+            weight: gold.weight,
+            principal: gold.principal,
+            interest: gold.interest,
+            intperm: gold.intperm
+        });
+    } catch (error) {
+        console.error('เกิดข้อผิดพลาดในการตรวจสอบสถานะทอง:', error);
+        res.json({ success: false, message: 'เกิดข้อผิดพลาดขณะตรวจสอบสถานะทอง' });
+    }
+});
+
 module.exports = router;

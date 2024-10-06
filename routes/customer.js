@@ -3,6 +3,8 @@ const express = require('express');
 const router = express.Router();
 const Customer = require('../models/customer'); // อ้างอิงโมเดล Customer
 const Pawn = require('../models/pawn');
+const Gold = require('../models/goldPawn');
+const Payment = require('../models/payment');
 
 // Middleware สำหรับตรวจสอบข้อมูลลูกค้า
 function validateCustomerData(req, res, next) {
@@ -113,22 +115,70 @@ router.post('/', validateCustomerData, async (req, res) => {
 router.delete('/:customerId', async (req, res) => {
     try {
         const { customerId } = req.params;
+        let deletedPawns = 0;
+        let deletedGolds = 0;
+        let deletedPayments = 0;
 
         // ค้นหาการจำนำที่เกี่ยวข้อง
         const pawns = await Pawn.find({ customerId: customerId });
 
-        // ลบการจำนำที่พบ
         if (pawns.length > 0) {
-            await Pawn.deleteMany({ customerId: customerId });
+            deletedPawns = pawns.length;
+            // ใช้ทั้ง _id และ pawnId ในการค้นหา Gold
+            const pawnIds = pawns.map(pawn => pawn._id.toString());
+            const pawnNumbers = pawns.map(pawn => pawn.pawnId);
+            
+            console.log('Pawn IDs:', pawnIds);
+            console.log('Pawn Numbers:', pawnNumbers);
+
+            // ตรวจสอบ Gold ที่เกี่ยวข้องโดยใช้ทั้ง _id และ pawnId
+            const relatedGolds = await Gold.find({ 
+                $or: [
+                    { pawnId: { $in: pawnIds } },
+                    { pawnId: { $in: pawnNumbers } }
+                ]
+            });
+            console.log(`Found ${relatedGolds.length} related gold records`);
+            deletedGolds = relatedGolds.length;
+
+            // รวบรวม goldIds ทั้งหมด
+            const goldIds = relatedGolds.map(gold => gold.goldId);
+
+            // ลบข้อมูล Payment ที่เกี่ยวข้องกับ Gold
+            const deletePaymentResult = await Payment.deleteMany({ goldId: { $in: goldIds } });
+            deletedPayments = deletePaymentResult.deletedCount;
+            console.log(`Deleted ${deletedPayments} payment records`);
+
+            // ลบข้อมูลทองคำที่เกี่ยวข้องกับ pawn ทั้งหมด
+            const deleteGoldResult = await Gold.deleteMany({ 
+                $or: [
+                    { pawnId: { $in: pawnIds } },
+                    { pawnId: { $in: pawnNumbers } }
+                ]
+            });
+            console.log(`Deleted ${deleteGoldResult.deletedCount} gold records`);
+            
+            // ลบการจำนำทั้งหมดของลูกค้า
+            const deletePawnResult = await Pawn.deleteMany({ customerId: customerId });
+            console.log(`Deleted ${deletePawnResult.deletedCount} pawn records`);
         }
 
         // ลบลูกค้า
-        await Customer.deleteOne({ customerId: customerId });
+        const deleteCustomerResult = await Customer.findOneAndDelete({ customerId: customerId });
+        if (!deleteCustomerResult) {
+            return res.status(404).json({ message: 'Customer not found' });
+        }
 
-        res.status(200).json({ message: 'Customer and related pawns deleted successfully' });
+        res.status(200).json({ 
+            message: 'Customer, related pawns, golds, and payments deleted successfully',
+            deletedCustomer: deleteCustomerResult,
+            deletedPawns,
+            deletedGolds,
+            deletedPayments
+        });
     } catch (error) {
-        console.error('Error deleting customer and related pawns:', error);
-        res.status(500).json({ message: 'Error deleting customer and related pawns' });
+        console.error('Error deleting customer and related data:', error);
+        res.status(500).json({ message: 'Error deleting customer and related data', error: error.message });
     }
 });
 
