@@ -22,7 +22,15 @@
 <body>
     <%- include('./partials/nav.ejs') %>
 
-    
+    <nav class="breadcrumb-nav fixed-top bg-light" style="--bs-breadcrumb-divider: '>'; margin-top: 59px;"
+        aria-label="breadcrumb">
+        <ol class="breadcrumb m-2">
+            <li class="breadcrumb-item"><a href="/">หน้าหลัก</a></li>
+            <li class="breadcrumb-item"><a href="/customer-list">รายชื่อลูกค้า</a></li>
+            <li class="breadcrumb-item"><a href="/pawn/<%= gold.pawnId %>">ข้อมูลจำนำ</a></li>
+            <li class="breadcrumb-item active" aria-current="page">ประวัติการชำระทอง</li>
+        </ol>
+    </nav>
 
     <div class="container" style="margin-top: 7.7%;">
         <h2>ประวัติการชำระของทอง ID: <%= gold.goldId %></h2>
