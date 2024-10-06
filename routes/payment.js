@@ -25,7 +25,6 @@ router.get('/gold-payment-history/:goldId', async (req, res) => {
             console.log('Gold not found');
             return res.status(404).render('error', { message: 'ไม่พบข้อมูลทอง' });
         }
-
         console.log('Gold found:', gold);
 
         // ดึงประวัติการชำระเงินโดยใช้ goldId
@@ -34,7 +33,6 @@ router.get('/gold-payment-history/:goldId', async (req, res) => {
             .lean();
         console.log('Payments found:', payments);
 
-        // คำนวณจำนวนเงินที่ชำระสำหรับแต่ละรายการ
         const calculatedPayments = payments.map(payment => ({
             ...payment,
             totalPayment: calculateTotalPayment(gold.principal, gold.intperm)
@@ -79,7 +77,6 @@ router.get('/gold/:goldId', async (req, res) => {
     }
 });
 
-// เพิ่มฟังก์ชัน generatePaymentId
 async function generatePaymentId() {
     const lastPayment = await Payment.findOne().sort({ createdAt: -1 });
     if (!lastPayment) return 'PM-0001';
@@ -147,10 +144,8 @@ router.post('/extend-payment/:goldId', async (req, res) => {
         console.log('New Start Date:', newStartDate);
         console.log('New Next Due Date:', newNextDueDate);
 
-        // สร้าง PaymentID ใหม่
         const newPaymentId = await generatePaymentId();
 
-        // สร้าง Payment ใหม่
         const newPayment = new Payment({
             paymentId: newPaymentId,
             startDate: newStartDate,
@@ -163,7 +158,6 @@ router.post('/extend-payment/:goldId', async (req, res) => {
 
         await newPayment.save();
 
-        // อัปเดตข้อมูลทอง
         const updatedGold = await Pawn.findOneAndUpdate(
             { goldId: goldId },
             {
@@ -251,8 +245,6 @@ router.post('/redeem', async (req, res) => {
             return res.status(400).json({ success: false, message: 'ทองถูกไถ่คืนแล้ว' });
         }
         
-
-        // สร้าง paymentId ใหม่
         const newPaymentId = await generatePaymentId();
 
         // สร้าง Payment ใหม่สำหรับการไถ่คืน

@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const express = require('express');
 const router = express.Router();
-const Customer = require('../models/customer'); // อ้างอิงโมเดล Customer
+const Customer = require('../models/customer'); 
 const Pawn = require('../models/pawn');
 const Gold = require('../models/goldPawn');
 const Payment = require('../models/payment');
@@ -10,27 +10,22 @@ const Payment = require('../models/payment');
 function validateCustomerData(req, res, next) {
     const { customerId, customerFName, customerLName, customerAddress, customerPhone } = req.body;
 
-    // ตรวจสอบว่าข้อมูลครบถ้วน
     if (!customerId || !customerFName || !customerLName || !customerAddress || !customerPhone) {
         return res.status(400).json({ message: 'กรุณากรอกข้อมูลลูกค้าทั้งหมด' });
     }
 
-    // ตรวจสอบว่า customerId เป็นเลข
     if (isNaN(customerId)) {
         return res.status(400).json({ message: 'ID ลูกค้าต้องเป็นตัวเลข 13 หลัก' });
     }
-
     // ตรวจสอบความยาวของชื่อและนามสกุล
     if (customerFName.length < 2 || customerLName.length < 2) {
         return res.status(400).json({ message: 'ชื่อและนามสกุลต้องมีความยาวอย่างน้อย 2 ตัวอักษร' });
     }
-
     // ตรวจสอบรูปแบบเบอร์โทร (ต้องมี 10 หลัก)
     const phonePattern = /^\d{10}$/;
     if (!phonePattern.test(customerPhone)) {
         return res.status(400).json({ message: 'เบอร์โทรต้องเป็นตัวเลข 10 หลัก' });
     }
-
     next();
 }
 
@@ -48,7 +43,7 @@ router.get('/:customerId', async (req, res) => {
         if (!customer) {
             return res.status(404).json({ message: 'ไม่พบข้อมูลลูกค้า' });
         }
-        res.render('customer', { customer, customerId }); // ส่งข้อมูลลูกค้าไปยัง view
+        res.render('customer', { customer, customerId }); 
     } catch (error) {
         console.error('Error fetching customer:', error);
         res.status(500).json({ message: 'เกิดข้อผิดพลาดในการค้นหาข้อมูลลูกค้า' });
@@ -73,7 +68,7 @@ router.put('/:customerId', validateCustomerData, async (req, res) => {
 
         res.json(updatedCustomer);
     } catch (error) {
-        console.error('Update Error:', error); // Log the error
+        console.error('Update Error:', error); 
         res.status(500).json({ message: 'เกิดข้อผิดพลาดในการอัปเดตข้อมูลลูกค้า' });
     }
 });
@@ -104,7 +99,7 @@ router.post('/', validateCustomerData, async (req, res) => {
         });
 
         await newCustomer.save();
-        res.status(201).redirect(`/customer/${newCustomer.customerId}`); // เปลี่ยนไปที่หน้าแสดงข้อมูลลูกค้า
+        res.status(201).redirect(`/customer/${newCustomer.customerId}`); 
     } catch (error) {
         console.error('Create Customer Error:', error);
         res.status(500).json({ message: 'เกิดข้อผิดพลาดในการเพิ่มข้อมูลลูกค้า' });

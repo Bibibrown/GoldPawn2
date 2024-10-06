@@ -4,11 +4,11 @@ const Schema = mongoose.Schema;
 const pawnSchema = new Schema({
     pawnId: {
         type: String,
-        unique: true // กำหนดให้ไม่ซ้ำกัน
+        unique: true 
     },
     customerId: {
         type: String, // อ้างอิงถึง customerId ในฝั่ง customer
-        ref: 'Customer', // กำหนดความสัมพันธ์กับ customer model
+        ref: 'Customer', 
         required: true
     },
     goldId: {

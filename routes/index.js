@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const Customer = require('../models/customer'); // โมเดลลูกค้า
-const GoldPawn = require('../models/goldPawn'); // โมเดลทอง
+const Customer = require('../models/customer'); 
+const GoldPawn = require('../models/goldPawn'); 
 
 // GET หน้าแรก
 router.get('/', (req, res) => {
@@ -10,7 +10,7 @@ router.get('/', (req, res) => {
 
 // GET หน้ารายชื่อลูกค้า
 router.get('/customer-list', async (req, res) => {
-    const searchQuery = req.query.search || ''; // รับคำค้นจาก query parameters
+    const searchQuery = req.query.search || '';
     try {
         const customers = await Customer.find({
             $or: [
@@ -20,7 +20,7 @@ router.get('/customer-list', async (req, res) => {
                 { customerPhone: new RegExp(searchQuery, 'i') }
             ]
         });
-        res.render('customerlist', { customers }); // ส่งข้อมูลลูกค้าไปยัง view
+        res.render('customerlist', { customers }); 
     } catch (error) {
         console.error('Error fetching customers:', error);
         res.status(500).send('Internal Server Error');
@@ -44,11 +44,9 @@ router.get('/gold-list', async (req, res) => {
         // ถ้าเป็นตัวเลข เพิ่มเงื่อนไขค้นหาสำหรับ weight
         searchCriteria.$or.push({ weight: numericSearch });
     }
-
     try {
-        const goldData = await GoldPawn.find(searchCriteria); // ไม่ต้อง populate typeName
+        const goldData = await GoldPawn.find(searchCriteria); 
 
-        // ส่งข้อมูลทองไปยัง view
         res.render('goldlist', { goldData, noData: goldData.length === 0 });
     } catch (error) {
         console.error('Error fetching gold data:', error);
