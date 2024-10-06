@@ -135,6 +135,10 @@ router.post('/addpawn/:customerId', async (req, res) => {
         await existingPawn.save();
         console.log('Pawn saved:', existingPawn);
 
+        type.goldId.push(newGoldId);
+        await  type.save();
+        console.log('Type saved:',  type);
+
         if (!customer.pawnId.includes(existingPawn.pawnId)) {
             customer.pawnId.push(existingPawn.pawnId);
             await customer.save();

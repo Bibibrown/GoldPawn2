@@ -10,6 +10,7 @@ const customersRoute = require('./routes/customer');
 const pawnRouter = require('./routes/pawn');
 const addDataRouter = require('./routes/addData');
 const paymentRouter = require('./routes/payment');
+const apiRouter = require('./routes/api');
 
 const app = express();
 const port = 3000; // กำหนดพอร์ตที่ต้องการใช้
@@ -35,6 +36,7 @@ app.use('/customer', customersRoute);
 app.use('/pawn', pawnRouter);
 app.use('/add-data', addDataRouter);
 app.use('/payment', paymentRouter);
+app.use('/api', apiRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
