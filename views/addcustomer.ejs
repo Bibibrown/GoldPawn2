@@ -10,6 +10,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         * {
             font-family: "Mitr", sans-serif;
@@ -106,13 +107,25 @@
             })
             .then(response => {
                 if (!response.ok) throw new Error('เกิดข้อผิดพลาดในการเพิ่มข้อมูลลูกค้า');
-                alert('เพิ่มข้อมูลลูกค้าเรียบร้อย');
-                
-                // นำไปยังหน้าข้อมูลลูกค้าใหม่
-                window.location.href = `/customer/${newCustomerData.customerId}`;
+                Swal.fire({
+                    icon: 'success',
+                    title: 'สำเร็จ!',
+                    text: 'เพิ่มข้อมูลลูกค้าเรียบร้อย',
+                    confirmButtonText: 'ตกลง'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // นำไปยังหน้าข้อมูลลูกค้าใหม่
+                        window.location.href = `/customer/${newCustomerData.customerId}`;
+                    }
+                });
             })
             .catch(err => {
-                alert(err.message);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'เกิดข้อผิดพลาด!',
+                    text: err.message,
+                    confirmButtonText: 'ตกลง'
+                });
             });
         });
     </script>

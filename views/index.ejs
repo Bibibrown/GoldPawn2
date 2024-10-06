@@ -11,6 +11,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@200;300;400;500;600;700&display=swap"
         rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         * {
             font-family: "Mitr", sans-serif;
@@ -50,31 +51,53 @@
         document.getElementById('searchButton').addEventListener('click', function () {
             const customerId = document.getElementById('searchId').value.trim();
             if (customerId) {
-                if (customerId.length !== 13 || !/^\d+$/.test(customerId)) {  // ตรวจสอบว่ามีแค่ตัวเลข
-                    alert('ID ลูกค้าต้องเป็นตัวเลขและมีความยาว 13 หลัก');
+                if (customerId.length !== 13 || !/^\d+$/.test(customerId)) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'ข้อมูลไม่ถูกต้อง',
+                        text: 'ID ลูกค้าต้องเป็นตัวเลขและมีความยาว 13 หลัก',
+                        confirmButtonText: 'ตกลง'
+                    });
                     return;
                 }
                 fetch(`/customer/${customerId}`)
                     .then(response => {
                         if (response.ok) {
-                            // ถ้ามีข้อมูลลูกค้าอยู่ในระบบ เปลี่ยนเส้นทางไปยังหน้ารายละเอียดลูกค้า
                             window.location.href = `/customer/${customerId}`;
                         } else if (response.status === 404) {
-                            alert('ไม่พบข้อมูลลูกค้า')
-                            // ถ้าไม่มีข้อมูลลูกค้า เปลี่ยนเส้นทางไปยังหน้าเพิ่มข้อมูลลูกค้าใหม่
-                            window.location.href = `/customer/add-customer?customerID=${customerId}`;
+                            Swal.fire({
+                                icon: 'info',
+                                title: 'ไม่พบข้อมูลลูกค้า',
+                                text: 'ต้องการเพิ่มข้อมูลลูกค้าใหม่หรือไม่?',
+                                showCancelButton: true,
+                                confirmButtonText: 'เพิ่มข้อมูล',
+                                cancelButtonText: 'ยกเลิก'
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    window.location.href = `/customer/add-customer?customerID=${customerId}`;
+                                }
+                            });
                         } else {
-                            // แสดงข้อผิดพลาดอื่นๆ
                             return response.json().then(errorData => {
                                 throw new Error(errorData.message || 'เกิดข้อผิดพลาดในการค้นหาข้อมูลลูกค้า');
                             });
                         }
                     })
                     .catch(err => {
-                        alert(err.message);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'เกิดข้อผิดพลาด',
+                            text: err.message,
+                            confirmButtonText: 'ตกลง'
+                        });
                     });
             } else {
-                alert('กรุณากรอก ID ลูกค้า');
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'ข้อมูลไม่ครบถ้วน',
+                    text: 'กรุณากรอก ID ลูกค้า',
+                    confirmButtonText: 'ตกลง'
+                });
             }
         });
     </script>

@@ -10,6 +10,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Mitr:wght@200;300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         *{
             font-family: "Mitr", sans-serif;
@@ -166,7 +167,6 @@
     <footer class="mt-5"></footer>
 
     <script>   
-        // เก็บระยะเวลาระหว่าง nextDueDate และ startDate แรก
         let goldId; // Add this line to store goldId at a higher scope
 
         document.addEventListener('DOMContentLoaded', function() {
@@ -281,15 +281,33 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        alert('ต่อดอกเรียบร้อยแล้ว');
-                        location.reload();
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'สำเร็จ!',
+                            text: 'ต่อดอกเรียบร้อยแล้ว',
+                            confirmButtonText: 'ตกลง'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                location.reload();
+                            }
+                        });
                     } else {
-                        alert('เกิดข้อผิดพลาด: ' + data.message);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'เกิดข้อผิดพลาด',
+                            text: data.message,
+                            confirmButtonText: 'ตกลง'
+                        });
                     }
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    alert('เกิดข้อผิดพลาดในการต่อดอก');
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'เกิดข้อผิดพลาด',
+                        text: 'เกิดข้อผิดพลาดในการต่อดอก',
+                        confirmButtonText: 'ตกลง'
+                    });
                 });
             });
         });
