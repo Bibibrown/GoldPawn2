@@ -146,20 +146,20 @@ router.get('/pawns/:pawnId', async (req, res) => {
 });
 
 // POST: เพิ่มpawnใหม่
-// router.post('/pawns', async (req, res) => {
-//     try {
-//         const newPawn = new addPawn({
-//             pawnId: await generatePawnId(),
-//             customerId: req.body.customerId,
-//             goldId: req.body.goldId || [] 
-//         });
-//         await newPawn.save();
-//         res.status(201).json(newPawn);
-//     } catch (error) {
-//         console.error(error); 
-//         res.status(500).json({ message: 'เกิดข้อผิดพลาดในการเพิ่มข้อมูลการจำนำ', error });
-//     }
-// });
+router.post('/pawns', async (req, res) => {
+    try {
+        const newPawn = new addPawn({
+            pawnId: await generatePawnId(),
+            customerId: req.body.customerId,
+            goldId: req.body.goldId || [] 
+        });
+        await newPawn.save();
+        res.status(201).json(newPawn);
+    } catch (error) {
+        console.error(error); 
+        res.status(500).json({ message: 'เกิดข้อผิดพลาดในการเพิ่มข้อมูลการจำนำ', error });
+    }
+});
 
 // PUT: แก้ไขข้อมูลpawn
 router.put('/pawns/:pawnId', async (req, res) => {
