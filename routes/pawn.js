@@ -58,6 +58,10 @@ router.get('/addpawn/:customerId', async (req, res) => {
         .sort({ createdAt: 1 });
 
         const typeList = await Type.find();
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
         const newGoldId = await generateGoldId();
         const newPID = await generatePawnId();
 

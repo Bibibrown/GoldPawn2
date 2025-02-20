@@ -259,6 +259,7 @@
                     return;
                 }
                 
+                
                 fetch(`/payment/gold/${goldId}`)
                     .then(response => response.json())
                     .then(data => {
@@ -429,7 +430,7 @@
                             document.getElementById('redeemEndDate').value = localISOTime;
                             
                             document.getElementById('initialAmount').value = data.principal;
-                            document.getElementById('interestAmount').value = data.interest; // เปลี่ยนจาก intperm เป็น interest
+                            document.getElementById('interestAmount').value = data.interest;
                             calculateTotal();
                         } else {
                             throw new Error(data.message || 'Failed to fetch gold data');
@@ -488,7 +489,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             const extendButton = document.getElementById('extendButton');
             const redeemButton = document.getElementById('redeemButton');
-            const goldStatus = '<%= gold.status %>'; // รับค่าสถานะจาก server
+            const goldStatus = '<%= gold.status %>';
 
             function updateButtonStatus() {
                 if (goldStatus === 'ไถ่คืน') {
